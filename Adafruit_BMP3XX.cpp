@@ -33,8 +33,8 @@
 ///! These SPI pins must be global in order to work with underlying library
 int8_t _BMP3_SoftwareSPI_MOSI; ///< Global SPI MOSI pin
 int8_t _BMP3_SoftwareSPI_MISO; ///< Global SPI MISO pin
-int8_t _BMP3_SoftwareSPI_SCK;  ///< Globak SPI Clock pin
-TwoWire *_BMP3_i2c;
+int8_t _BMP3_SoftwareSPI_SCK;  ///< Global SPI Clock pin
+TwoWire *_BMP3_i2c;            ///< Global I2C interface pointer
 
 // Our hardware interface functions
 static int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
@@ -93,6 +93,7 @@ Adafruit_BMP3XX::Adafruit_BMP3XX(int8_t cspin, int8_t mosipin, int8_t misopin, i
     calibration data in preparation for sensor reads.
 
     @param  addr Optional parameter for the I2C address of BMP3. Default is 0x77
+    @param  theWire Optional parameter for the I2C device we will use. Default is "Wire"
     @return True on sensor initialization success. False on failure.
 */
 /**************************************************************************/
@@ -335,7 +336,7 @@ bool Adafruit_BMP3XX::setPressureOversampling(uint8_t oversample) {
 /**************************************************************************/
 /*!
     @brief  Setter for IIR filter coefficient
-    @param filtersize Size of the filter (in samples). Can be BMP3_IIR_FILTER_DISABLE (no filtering), BMP3_IIR_FILTER_COEFF_1, BMP3_IIR_FILTER_COEFF_3, BMP3_IIR_FILTER_COEFF_7, BMP3_IIR_FILTER_COEFF_15, BMP3_IIR_FILTER_COEFF_31, BMP3_IIR_FILTER_COEFF_63, BMP3_IIR_FILTER_COEFF_127
+    @param filtercoeff Coefficient of the filter (in samples). Can be BMP3_IIR_FILTER_DISABLE (no filtering), BMP3_IIR_FILTER_COEFF_1, BMP3_IIR_FILTER_COEFF_3, BMP3_IIR_FILTER_COEFF_7, BMP3_IIR_FILTER_COEFF_15, BMP3_IIR_FILTER_COEFF_31, BMP3_IIR_FILTER_COEFF_63, BMP3_IIR_FILTER_COEFF_127
     @return True on success, False on failure
 
 */
