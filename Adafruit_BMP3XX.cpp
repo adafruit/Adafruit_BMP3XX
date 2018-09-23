@@ -257,6 +257,8 @@ bool Adafruit_BMP3XX::performReading(void) {
     settings_sel |= BMP3_ODR_SEL;
   }
 
+  // set interrupt to data ready
+  //settings_sel |= BMP3_DRDY_EN_SEL | BMP3_LEVEL_SEL | BMP3_LATCH_SEL;
 
   /* Set the desired sensor configuration */
 #ifdef BMP3XX_DEBUG
