@@ -28,7 +28,7 @@
 #include "Arduino.h"
 #include "Adafruit_BMP3XX.h"
 
-#define BMP3XX_DEBUG
+//#define BMP3XX_DEBUG
 
 ///! These SPI pins must be global in order to work with underlying library
 int8_t _BMP3_SoftwareSPI_MOSI; ///< Global SPI MOSI pin
