@@ -1,4 +1,4 @@
-# Adafruit_BMP3XX [![Build Status](https://travis-ci.org/adafruit/Adafruit_BMP3XX.svg?branch=master)](https://travis-ci.org/adafruit/Adafruit_BMP3XX)
+# Adafruit_BMP3XX [![Build Status](https://travis-ci.com/adafruit/Adafruit_BMP3XX.svg?branch=master)](https://travis-ci.com/adafruit/Adafruit_BMP3XX)
 
 <img src="https://cdn-shop.adafruit.com/970x728/3966-00.jpg" height="300"/>
 
