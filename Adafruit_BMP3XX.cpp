@@ -162,8 +162,8 @@ bool Adafruit_BMP3XX::begin(uint8_t addr, TwoWire *theWire) {
   setPressureOversampling(BMP3_NO_OVERSAMPLING);
   setIIRFilterCoeff(BMP3_IIR_FILTER_DISABLE);
 
-  // don't do anything till we request a reading
-  the_sensor.settings.op_mode = BMP3_FORCED_MODE;
+  // select normal mode
+  the_sensor.settings.op_mode = BMP3_NORMAL_MODE;
 
   return true;
 }
