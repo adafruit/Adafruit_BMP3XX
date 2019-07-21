@@ -41,11 +41,11 @@ void setup() {
     while (1);
   }
 
-  // for details see BMP388 specification chapter 3.5 Table 9
-bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_2X);   // 2 is enough according  to BMP388 specification chapter 3.4.1
-bmp.setPressureOversampling(BMP3_OVERSAMPLING_16X);     // available settings 1(no), 2,4,8,16,32
-bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_31);        // available settings 1,3,7,15,31,63,127
-bmp.setOutputDataRate(BMP3_ODR_25_HZ);                  // available settings see bmp3_defs.h line 223ff
+  // Set up oversampling and filter initialization
+  bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
+  bmp.setPressureOversampling(BMP3_OVERSAMPLING_4X);
+  bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
+  //bmp.setOutputDataRate(BMP3_ODR_50_HZ);
 }
 
 void loop() {
