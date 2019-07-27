@@ -54,12 +54,19 @@ class Adafruit_BMP3XX
     bool  begin(uint8_t addr = BMP3XX_DEFAULT_ADDRESS, TwoWire *theWire=&Wire);
     float readTemperature(void);
     float readPressure(void);
+    float getSeaLevelPressure(double atmospheriquePressure, double YourActualAltitude);
     float readAltitude(float seaLevel);
 
-    bool setTemperatureOversampling(uint8_t os);
-    bool setPressureOversampling(uint8_t os);
-    bool setIIRFilterCoeff(uint8_t fs);
-    bool setOutputDataRate(uint8_t odr);
+    bool setConfig(
+      uint8_t PressureOversampling = BMP3_NO_OVERSAMPLING,
+      uint8_t TemperatureOversampling = BMP3_NO_OVERSAMPLING,
+      uint8_t IIRFilter = BMP3_IIR_FILTER_DISABLE,
+      uint8_t PowerMode = BMP3_FORCED_MODE,
+      uint8_t OutputDataRate = BMP3_ODR_200_HZ);
+    //bool setTemperatureOversampling(uint8_t os);
+    //bool setPressureOversampling(uint8_t os);
+    //bool setIIRFilterCoeff(uint8_t fs);
+    //bool setOutputDataRate(uint8_t odr);
 
     /// Perform a reading in blocking mode
     bool performReading(void);
@@ -70,7 +77,8 @@ class Adafruit_BMP3XX
     double pressure;
 
   private:
-    bool _filterEnabled, _tempOSEnabled, _presOSEnabled, _ODREnabled;
+    //bool _filterEnabled, _tempOSEnabled, _presOSEnabled, _ODREnabled;
+    bool _forcedModeEnabled;
     uint8_t _i2caddr;
     int32_t _sensorID;
     int8_t _cs;
