@@ -420,27 +420,22 @@ static void delay_msec(uint32_t ms){
     @param IIRFilter                      default BMP3_IIR_FILTER_DISABLE
     @param PowerMode                      default BMP3_FORCED_MODE
     @param OutputDataRate                 default BMP3_ODR_200_HZ, set if PowerMode = BMP3_NORMAL_MODE
+    @param AddInterrupt                   default false
 
     @return True on success, False on failure
 */
 /**************************************************************************/
-bool Adafruit_BMP3XX::setConfig(
-    uint8_t PressureOversampling /* = BMP3_NO_OVERSAMPLING */,
-    uint8_t TemperatureOversampling /* = BMP3_NO_OVERSAMPLING */,
-    uint8_t IIRFilter /* = BMP3_IIR_FILTER_DISABLE */,
-    uint8_t PowerMode /* = BMP3_FORCED_MODE */,
-    uint8_t OutputDataRate /* = BMP3_ODR_200_HZ */)
+bool Adafruit_BMP3XX::setConfig(uint8_t PressureOversampling, uint8_t TemperatureOversampling, uint8_t IIRFilter, uint8_t PowerMode, uint8_t OutputDataRate, bool AddInterrupt)
 {
-  int8_t rslt;
-  /* Used to select the settings user needs to change */
-  uint16_t settings_sel = BMP3_PRESS_EN_SEL | BMP3_TEMP_EN_SEL;
- 
-  //TODO interrupt settings
-  //settings_sel |= BMP3_DRDY_EN_SEL | BMP3_LEVEL_SEL | BMP3_LATCH_SEL;
- 
+  int8_t rslt = BMP3_OK;
+  uint16_t settings_sel = 0;
+
+
   /* Select the pressure and temperature sensor to be enabled */
   the_sensor.settings.press_en = BMP3_ENABLE;
   the_sensor.settings.temp_en = BMP3_ENABLE;
+  settings_sel |= BMP3_PRESS_EN_SEL | BMP3_TEMP_EN_SEL;
+
 
   /* set pressure settings */
   if (PressureOversampling > BMP3_OVERSAMPLING_32X)
@@ -448,11 +443,9 @@ bool Adafruit_BMP3XX::setConfig(
     printf("error pressure oversampling \n");
     return false;
   }
-
   the_sensor.settings.odr_filter.press_os = PressureOversampling;
-  if (PressureOversampling != BMP3_NO_OVERSAMPLING)
-    settings_sel |= BMP3_PRESS_OS_SEL;
-  //bool pressOSEnabled = PressureOversampling != BMP3_NO_OVERSAMPLING;
+  settings_sel |= BMP3_PRESS_OS_SEL;
+
 
   /* set temperature settings */
   if (TemperatureOversampling > BMP3_OVERSAMPLING_32X)
@@ -460,11 +453,8 @@ bool Adafruit_BMP3XX::setConfig(
     printf("error temp oversampling \n");
     return false;
   }
-
   the_sensor.settings.odr_filter.temp_os = TemperatureOversampling;
-  if (TemperatureOversampling != BMP3_NO_OVERSAMPLING)
-    settings_sel |= BMP3_TEMP_OS_SEL;
-  //bool tempOSEnabled = TemperatureOversampling != BMP3_NO_OVERSAMPLING;
+  settings_sel |= BMP3_TEMP_OS_SEL;
 
   /* set iirFilter settings */
   if (IIRFilter > BMP3_IIR_FILTER_COEFF_127)
@@ -472,23 +462,30 @@ bool Adafruit_BMP3XX::setConfig(
     printf("error iir filter \n");
     return false;
   }
-
   the_sensor.settings.odr_filter.iir_filter = IIRFilter;
-  if (IIRFilter != BMP3_IIR_FILTER_DISABLE)
-    settings_sel |= BMP3_IIR_FILTER_SEL;
+  settings_sel |= BMP3_IIR_FILTER_SEL;
 
   /* set output data rate */
-  if (OutputDataRate == BMP3_NORMAL_MODE)
+  if (PowerMode == BMP3_NORMAL_MODE)
   {
     if (OutputDataRate > BMP3_ODR_0_001_HZ)
     {
       printf("error data rate \n");
       return false;
     }
-
     the_sensor.settings.odr_filter.odr = OutputDataRate;
     settings_sel |= BMP3_ODR_SEL;
   }
+
+  /* set interrupt settings */
+  //TODO check if interrupt settings are ok
+  the_sensor.settings.int_settings.drdy_en = 
+      (PowerMode == BMP3_NORMAL_MODE && AddInterrupt) ? BMP3_ENABLE : BMP3_DISABLE;
+  //the_sensor.settings.int_settings.latch = BMP3_INT_PIN_NON_LATCH; //BMP3_INT_PIN_LATCH
+  //the_sensor.settings.int_settings.level = BMP3_INT_PIN_ACTIVE_HIGH; //BMP3_INT_PIN_ACTIVE_LOW
+  //the_sensor.settings.int_settings.output_mode = BMP3_INT_PIN_PUSH_PULL; //BMP3_INT_PIN_OPEN_DRAIN
+  settings_sel |= BMP3_DRDY_EN_SEL; // | BMP3_LEVEL_SEL | BMP3_LATCH_SEL | BMP3_OUTPUT_MODE_SEL;
+
   /* set sensor settings */
   rslt = bmp3_set_sensor_settings(settings_sel, &the_sensor);
   if (rslt != BMP3_OK)

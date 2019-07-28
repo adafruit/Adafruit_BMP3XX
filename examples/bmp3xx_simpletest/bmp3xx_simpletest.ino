@@ -26,10 +26,17 @@
 #define BMP_CS 10
 
 #define SEALEVELPRESSURE_HPA (1013.25)
+#define INT_PIN 33 // connect adafruit int pin to your board
+//#define INTERRUPT
 
+bool new_BMP_data = false;
 Adafruit_BMP3XX bmp; // I2C
 //Adafruit_BMP3XX bmp(BMP_CS); // hardware SPI
 //Adafruit_BMP3XX bmp(BMP_CS, BMP_MOSI, BMP_MISO,  BMP_SCK);
+
+void IRAM_ATTR sensorDataREady() {
+  new_BMP_data = true;
+}
 
 void setup()
 {
@@ -45,19 +52,42 @@ void setup()
       ;
   }
 
-  // Set up oversampling and filter initialization
-  //bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
-  //bmp.setPressureOversampling(BMP3_OVERSAMPLING_4X);
-  //bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
-  //bmp.setOutputDataRate(BMP3_ODR_50_HZ);
+#ifdef INTERRUPT
 
-  bmp.setConfig(BMP3_OVERSAMPLING_8X, BMP3_OVERSAMPLING_4X, BMP3_IIR_FILTER_COEFF_3, BMP3_FORCED_MODE);
+  pinMode(INT_PIN, INPUT_PULLUP);
+  attachInterrupt(INT_PIN, sensorDataREady, RISING);
+
+  bmp.setConfig(BMP3_OVERSAMPLING_16X, BMP3_OVERSAMPLING_2X, BMP3_IIR_FILTER_COEFF_7, BMP3_NORMAL_MODE, BMP3_ODR_25_HZ, true);
+#else
+  bmp.setConfig(BMP3_OVERSAMPLING_16X, BMP3_OVERSAMPLING_2X, BMP3_IIR_FILTER_COEFF_7, BMP3_FORCED_MODE);
   // recommended for drone application
   // bmp.setConfig(BMP3_OVERSAMPLING_8X, BMP3_NO_OVERSAMPLING,BMP3_IIR_FILTER_COEFF_1,BMP3_NORMAL_MODE, BMP3_ODR_25_HZ);
+#endif
 }
 
 void loop()
 {
+#ifdef INTERRUPT
+  if(new_BMP_data) {
+    new_BMP_data = false;
+    if (!bmp.performReading())
+  {
+    Serial.println("Failed to perform reading :(");
+    return;
+  }
+  Serial.print("Temperature = ");
+  Serial.print(bmp.temperature);
+  Serial.println(" *C");
+  Serial.print("Pressure = ");
+  Serial.print(bmp.pressure / 100.0);
+  Serial.println(" hPa");
+
+  Serial.print("Approx. Altitude = ");
+  Serial.print(bmp.readAltitude(SEALEVELPRESSURE_HPA));
+  Serial.println(" m");
+  Serial.println();
+  }
+#else
   if (!bmp.performReading())
   {
     Serial.println("Failed to perform reading :(");
@@ -75,4 +105,5 @@ void loop()
   Serial.println(" m");
   Serial.println();
   delay(2000);
+#endif
 }
