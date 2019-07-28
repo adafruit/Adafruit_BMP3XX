@@ -26,15 +26,16 @@
 #define BMP_CS 10
 
 #define SEALEVELPRESSURE_HPA (1013.25)
-#define INT_PIN 33 // connect adafruit int pin to your board
+#define INT_PIN 2 // connect adafruit int pin to your board
 //#define INTERRUPT
 
 bool new_BMP_data = false;
+
 Adafruit_BMP3XX bmp; // I2C
 //Adafruit_BMP3XX bmp(BMP_CS); // hardware SPI
 //Adafruit_BMP3XX bmp(BMP_CS, BMP_MOSI, BMP_MISO,  BMP_SCK);
 
-void IRAM_ATTR sensorDataREady() {
+void sensorDataREady() {
   new_BMP_data = true;
 }
 
@@ -55,7 +56,7 @@ void setup()
 #ifdef INTERRUPT
 
   pinMode(INT_PIN, INPUT_PULLUP);
-  attachInterrupt(INT_PIN, sensorDataREady, RISING);
+  attachInterrupt(digitalPinToInterrupt(INT_PIN), sensorDataREady, FALLING);
 
   bmp.setConfig(BMP3_OVERSAMPLING_16X, BMP3_OVERSAMPLING_2X, BMP3_IIR_FILTER_COEFF_7, BMP3_NORMAL_MODE, BMP3_ODR_25_HZ, true);
 #else
