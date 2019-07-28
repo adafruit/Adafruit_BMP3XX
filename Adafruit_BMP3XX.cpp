@@ -65,7 +65,6 @@ Adafruit_BMP3XX::Adafruit_BMP3XX(int8_t cspin)
   _forcedModeEnabled = false;
 }
 
-
 /**************************************************************************/
 /*!
     @brief  Instantiates sensor with Software (bit-bang) SPI.
@@ -84,8 +83,6 @@ Adafruit_BMP3XX::Adafruit_BMP3XX(int8_t cspin, int8_t mosipin, int8_t misopin, i
   //_filterEnabled = _tempOSEnabled = _presOSEnabled = false;
   _forcedModeEnabled = false;
 }
-
-
 
 /**************************************************************************/
 /*!
@@ -160,17 +157,8 @@ bool Adafruit_BMP3XX::begin(uint8_t addr, TwoWire *theWire) {
   //Serial.print("T lin = "); Serial.println(the_sensor.calib_data.reg_calib_data.t_lin);
 #endif
 
-  //setTemperatureOversampling(BMP3_NO_OVERSAMPLING);
-  //setPressureOversampling(BMP3_NO_OVERSAMPLING);
-  //setIIRFilterCoeff(BMP3_IIR_FILTER_DISABLE);
-
-  // don't do anything till we request a reading
-  //the_sensor.settings.op_mode = BMP3_FORCED_MODE;
-
-  //return true;
   return setConfig();
 }
-
 
 /**************************************************************************/
 /*!
@@ -183,7 +171,6 @@ float Adafruit_BMP3XX::readTemperature(void) {
   return temperature;
 }
 
-
 /**************************************************************************/
 /*!
     @brief Performs a reading and returns the barometric pressure.
@@ -194,8 +181,6 @@ float Adafruit_BMP3XX::readPressure(void) {
   performReading();
   return pressure;
 }
-
-
 
 /**************************************************************************/
 /*!
@@ -208,6 +193,7 @@ float Adafruit_BMP3XX::readPressure(void) {
     @return Altitude in meters
 */
 /**************************************************************************/
+
 float Adafruit_BMP3XX::readAltitude(float seaLevel)
 {
     // Equation taken from BMP180 datasheet (page 16):
@@ -232,50 +218,11 @@ float Adafruit_BMP3XX::readAltitude(float seaLevel)
 /**************************************************************************/
 bool Adafruit_BMP3XX::performReading(void) {
   int8_t rslt;
-//   /* Used to select the settings user needs to change */
-//   uint16_t settings_sel = 0;
+ 
   /* Variable used to select the sensor component */
   uint8_t sensor_comp;
-
-//   /* Select the pressure and temperature sensor to be enabled */
-//   the_sensor.settings.temp_en = BMP3_ENABLE;
-//   settings_sel |= BMP3_TEMP_EN_SEL;
-//   sensor_comp |= BMP3_TEMP;
-//   if (_tempOSEnabled) {
-//      settings_sel |= BMP3_TEMP_OS_SEL;
-//   }
-
-//   the_sensor.settings.press_en = BMP3_ENABLE;
-//   settings_sel |= BMP3_PRESS_EN_SEL;
-//   sensor_comp |= BMP3_PRESS;
-//   if (_presOSEnabled) {
-//     settings_sel |= BMP3_PRESS_OS_SEL ;
-//   }
-
-//   if (_filterEnabled) {
-//     settings_sel |= BMP3_IIR_FILTER_SEL;
-//   }
-
-//   if (_ODREnabled) {
-//     settings_sel |= BMP3_ODR_SEL;
-//   }
-
-//   // set interrupt to data ready
-//   //settings_sel |= BMP3_DRDY_EN_SEL | BMP3_LEVEL_SEL | BMP3_LATCH_SEL;
-
-//   /* Set the desired sensor configuration */
-// #ifdef BMP3XX_DEBUG
-//   Serial.println("Setting sensor settings");
-// #endif
-//   rslt = bmp3_set_sensor_settings(settings_sel, &the_sensor);
-//   if (rslt != BMP3_OK)
-//     return false;
-
-//   /* Set the power mode */
-//   the_sensor.settings.op_mode = BMP3_FORCED_MODE;
-// #ifdef BMP3XX_DEBUG
-//   Serial.println("Setting power mode");
-// #endif
+ 
+  /* if forced mode, set power mode of the sensor at each reading*/
   if (_forcedModeEnabled){
     rslt = bmp3_set_op_mode(&the_sensor);
     if (rslt != BMP3_OK){
@@ -288,102 +235,21 @@ bool Adafruit_BMP3XX::performReading(void) {
 
   /* Variable used to store the compensated data */
   struct bmp3_data data;
+ 
   /* Sensor component selection */
   sensor_comp = BMP3_PRESS | BMP3_TEMP;
+ 
   /* Temperature and Pressure data are read and stored in the bmp3_data instance */
   rslt = bmp3_get_sensor_data(sensor_comp, &data, &the_sensor);
   if (rslt != BMP3_OK)
     return false;
+ 
   /* Save the temperature and pressure data */
   temperature = data.temperature;
   pressure = data.pressure;
-//   if (rslt != BMP3_OK)
-//     return false;
 
   return true;
 }
-
-
-/**************************************************************************/
-/*!
-    @brief  Setter for Temperature oversampling
-    @param  oversample Oversampling setting, can be BMP3_NO_OVERSAMPLING, BMP3_OVERSAMPLING_2X, BMP3_OVERSAMPLING_4X, BMP3_OVERSAMPLING_8X, BMP3_OVERSAMPLING_16X, BMP3_OVERSAMPLING_32X
-    @return True on success, False on failure
-*/
-/**************************************************************************/
-
-// bool Adafruit_BMP3XX::setTemperatureOversampling(uint8_t oversample) {
-//   if (oversample > BMP3_OVERSAMPLING_32X) return false;
-
-//   the_sensor.settings.odr_filter.temp_os = oversample;
-
-//   if (oversample == BMP3_NO_OVERSAMPLING)
-//     _tempOSEnabled = false;
-//   else
-//     _tempOSEnabled = true;
-
-//   return true;
-// }
-
-
-/**************************************************************************/
-/*!
-    @brief  Setter for Pressure oversampling
-    @param  oversample Oversampling setting, can be BMP3_NO_OVERSAMPLING, BMP3_OVERSAMPLING_2X, BMP3_OVERSAMPLING_4X, BMP3_OVERSAMPLING_8X, BMP3_OVERSAMPLING_16X, BMP3_OVERSAMPLING_32X
-    @return True on success, False on failure
-*/
-/**************************************************************************/
-// bool Adafruit_BMP3XX::setPressureOversampling(uint8_t oversample) {
-//   if (oversample > BMP3_OVERSAMPLING_32X) return false;
-
-//   the_sensor.settings.odr_filter.press_os = oversample;
-
-//   if (oversample == BMP3_NO_OVERSAMPLING)
-//     _presOSEnabled = false;
-//   else
-//     _presOSEnabled = true;
-
-//   return true;
-// }
-
-/**************************************************************************/
-/*!
-    @brief  Setter for IIR filter coefficient
-    @param filtercoeff Coefficient of the filter (in samples). Can be BMP3_IIR_FILTER_DISABLE (no filtering), BMP3_IIR_FILTER_COEFF_1, BMP3_IIR_FILTER_COEFF_3, BMP3_IIR_FILTER_COEFF_7, BMP3_IIR_FILTER_COEFF_15, BMP3_IIR_FILTER_COEFF_31, BMP3_IIR_FILTER_COEFF_63, BMP3_IIR_FILTER_COEFF_127
-    @return True on success, False on failure
-
-*/
-/**************************************************************************/
-// bool Adafruit_BMP3XX::setIIRFilterCoeff(uint8_t filtercoeff) {
-//   if (filtercoeff > BMP3_IIR_FILTER_COEFF_127) return false;
-
-//   the_sensor.settings.odr_filter.iir_filter = filtercoeff;
-
-//   if (filtercoeff == BMP3_IIR_FILTER_DISABLE)
-//     _filterEnabled = false;
-//   else
-//     _filterEnabled = true;
-
-//   return true;
-// }
-
-/**************************************************************************/
-/*!
-    @brief  Setter for output data rate (ODR)
-    @param odr Sample rate in Hz. Can be BMP3_ODR_200_HZ, BMP3_ODR_100_HZ, BMP3_ODR_50_HZ, BMP3_ODR_25_HZ, BMP3_ODR_12_5_HZ, BMP3_ODR_6_25_HZ, BMP3_ODR_3_1_HZ, BMP3_ODR_1_5_HZ, BMP3_ODR_0_78_HZ, BMP3_ODR_0_39_HZ, BMP3_ODR_0_2_HZ, BMP3_ODR_0_1_HZ, BMP3_ODR_0_05_HZ, BMP3_ODR_0_02_HZ, BMP3_ODR_0_01_HZ, BMP3_ODR_0_006_HZ, BMP3_ODR_0_003_HZ, or BMP3_ODR_0_001_HZ 
-    @return True on success, False on failure
-
-*/
-/**************************************************************************/
-// bool Adafruit_BMP3XX::setOutputDataRate(uint8_t odr) {
-//   if (odr > BMP3_ODR_0_001_HZ) return false;
-
-//   the_sensor.settings.odr_filter.odr = odr;
-
-//   _ODREnabled = true;
-
-//   return true;
-// }
 
 /**************************************************************************/
 /*!
@@ -568,7 +434,10 @@ bool Adafruit_BMP3XX::setConfig(
   int8_t rslt;
   /* Used to select the settings user needs to change */
   uint16_t settings_sel = BMP3_PRESS_EN_SEL | BMP3_TEMP_EN_SEL;
-
+ 
+  //TODO interrupt settings
+  //settings_sel |= BMP3_DRDY_EN_SEL | BMP3_LEVEL_SEL | BMP3_LATCH_SEL;
+ 
   /* Select the pressure and temperature sensor to be enabled */
   the_sensor.settings.press_en = BMP3_ENABLE;
   the_sensor.settings.temp_en = BMP3_ENABLE;
@@ -633,6 +502,7 @@ bool Adafruit_BMP3XX::setConfig(
   {
     _forcedModeEnabled = PowerMode == BMP3_FORCED_MODE;
     the_sensor.settings.op_mode = PowerMode;
+   
     rslt = bmp3_set_op_mode(&the_sensor);
     if (rslt != BMP3_OK)
     {
