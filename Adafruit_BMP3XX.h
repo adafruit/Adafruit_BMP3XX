@@ -61,10 +61,6 @@ public:
       uint8_t PowerMode = BMP3_FORCED_MODE,
       uint8_t OutputDataRate = BMP3_ODR_200_HZ,
       bool AddInterrupt = false);
-  //bool setTemperatureOversampling(uint8_t os);
-  //bool setPressureOversampling(uint8_t os);
-  //bool setIIRFilterCoeff(uint8_t fs);
-  //bool setOutputDataRate(uint8_t odr);
 
   /// Perform a reading in blocking mode
   bool performReading(void);
@@ -75,7 +71,6 @@ public:
   double pressure;
 
 private:
-  //bool _filterEnabled, _tempOSEnabled, _presOSEnabled, _ODREnabled;
   bool _forcedModeEnabled;
   uint8_t _i2caddr;
   int32_t _sensorID;
