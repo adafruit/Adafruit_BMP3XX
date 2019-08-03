@@ -28,7 +28,7 @@
 #include "Arduino.h"
 #include "Adafruit_BMP3XX.h"
 
-//#define BMP3XX_DEBUG
+#define BMP3XX_DEBUG
 
 ///! These SPI pins must be global in order to work with underlying library
 int8_t _BMP3_SoftwareSPI_MOSI; ///< Global SPI MOSI pin
@@ -157,7 +157,7 @@ bool Adafruit_BMP3XX::begin(uint8_t addr, TwoWire *theWire) {
   //Serial.print("T lin = "); Serial.println(the_sensor.calib_data.reg_calib_data.t_lin);
 #endif
 
-  return setConfig();
+  return setSensorInSleepMode();
 }
 
 /**************************************************************************/
@@ -193,7 +193,6 @@ float Adafruit_BMP3XX::readPressure(void) {
     @return Altitude in meters
 */
 /**************************************************************************/
-
 float Adafruit_BMP3XX::readAltitude(float seaLevel)
 {
     // Equation taken from BMP180 datasheet (page 16):
@@ -411,12 +410,19 @@ static void delay_msec(uint32_t ms){
   delay(ms);
 }
 
+bool Adafruit_BMP3XX::setSensorInSleepMode(){
+  uint8_t rslt = BMP3_OK;
+  _forcedModeEnabled = false;
+  rslt = bmp3_soft_reset(&the_sensor);
+  return rslt == BMP3_OK;
+}
+
 /**************************************************************************/
 /*!
     @brief configure the sensor with desired settings.
 
-    @param PressureOversampling           default BMP3_NO_OVERSAMPLING
     @param TemperatureOversampling        default BMP3_NO_OVERSAMPLING
+    @param PressureOversampling           default BMP3_NO_OVERSAMPLING
     @param IIRFilter                      default BMP3_IIR_FILTER_DISABLE
     @param PowerMode                      default BMP3_FORCED_MODE
     @param OutputDataRate                 default BMP3_ODR_200_HZ, set if PowerMode = BMP3_NORMAL_MODE
@@ -425,7 +431,7 @@ static void delay_msec(uint32_t ms){
     @return True on success, False on failure
 */
 /**************************************************************************/
-bool Adafruit_BMP3XX::setConfig(uint8_t PressureOversampling, uint8_t TemperatureOversampling, uint8_t IIRFilter, uint8_t PowerMode, uint8_t OutputDataRate, bool AddInterrupt)
+bool Adafruit_BMP3XX::setConfig( uint8_t TemperatureOversampling, uint8_t PressureOversampling, uint8_t IIRFilter, uint8_t PowerMode, uint8_t OutputDataRate, bool DataReadyInterrupt)
 {
   int8_t rslt = BMP3_OK;
   uint16_t settings_sel = 0;
@@ -480,7 +486,7 @@ bool Adafruit_BMP3XX::setConfig(uint8_t PressureOversampling, uint8_t Temperatur
   /* set interrupt settings */
   //TODO check if interrupt settings are ok
   the_sensor.settings.int_settings.drdy_en = 
-      (PowerMode == BMP3_NORMAL_MODE && AddInterrupt) ? BMP3_ENABLE : BMP3_DISABLE;
+      (PowerMode == BMP3_NORMAL_MODE && DataReadyInterrupt) ? BMP3_ENABLE : BMP3_DISABLE;
   //the_sensor.settings.int_settings.latch = BMP3_INT_PIN_NON_LATCH; //BMP3_INT_PIN_LATCH
   //the_sensor.settings.int_settings.level = BMP3_INT_PIN_ACTIVE_HIGH; //BMP3_INT_PIN_ACTIVE_LOW
   //the_sensor.settings.int_settings.output_mode = BMP3_INT_PIN_PUSH_PULL; //BMP3_INT_PIN_OPEN_DRAIN
@@ -493,6 +499,11 @@ bool Adafruit_BMP3XX::setConfig(uint8_t PressureOversampling, uint8_t Temperatur
     printf("error set sensor settings \n");
     return false;
   }
+
+  #ifdef BMP3XX_DEBUG
+    bmp3_get_sensor_settings(&the_sensor);
+    Serial.printf("temp en: %u, temp os: %u, press en: %u, press os: %u, odr: %u", the_sensor.settings.temp_en, the_sensor.settings.odr_filter.temp_os, the_sensor.settings.press_en, the_sensor.settings.odr_filter.press_os, the_sensor.settings.odr_filter.odr);
+  #endif
 
   /* set power mode */
   if (PowerMode == BMP3_NORMAL_MODE || PowerMode == BMP3_FORCED_MODE || PowerMode == BMP3_SLEEP_MODE)
@@ -527,4 +538,18 @@ bool Adafruit_BMP3XX::setConfig(uint8_t PressureOversampling, uint8_t Temperatur
 float Adafruit_BMP3XX::getSeaLevelPressure(double atmospheriquePressure, double yourActualAltitude)
 {
   return (atmospheriquePressure / pow(1.0f - (yourActualAltitude / 44330.0f), 5.255f));
+}
+
+/**************************************************************************/
+/*!
+    @brief Calculate altitude from Pressure & Sea level pressure
+
+    @param  [double] atmospheriquePressure      local pressure in Pa
+    @param  [double] seaLevelPressure           sea level pressure in Pa
+    @return [double] altitude in meter
+*/
+/**************************************************************************/
+double Adafruit_BMP3XX::getAltitude(double pressure, double seaLevelPressure)
+{
+    return (44330.0f * (1.0f - pow((double)pressure / (double)seaLevelPressure, 0.1902949f)));
 }

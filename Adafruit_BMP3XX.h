@@ -53,15 +53,45 @@ public:
   float readPressure(void);
   float getSeaLevelPressure(double atmospheriquePressure, double YourActualAltitude);
   float readAltitude(float seaLevel);
+  double getAltitude(double pressure, double seaLevelPressure = 101325);
 
-  bool setConfig(
-      uint8_t PressureOversampling = BMP3_NO_OVERSAMPLING,
-      uint8_t TemperatureOversampling = BMP3_NO_OVERSAMPLING,
-      uint8_t IIRFilter = BMP3_IIR_FILTER_DISABLE,
-      uint8_t PowerMode = BMP3_FORCED_MODE,
-      uint8_t OutputDataRate = BMP3_ODR_200_HZ,
-      bool AddInterrupt = false);
+/**************************************************************************/
+/*!
+    @brief Put the sensor in forced mode with desired settings. Call performReading() or readAltitude() to get datas.
 
+    @param TemperatureOversampling        default BMP3_NO_OVERSAMPLING
+    @param PressureOversampling           default BMP3_NO_OVERSAMPLING
+    @param IIRFilter                      default BMP3_IIR_FILTER_DISABLE
+
+    @return True on success, False on failure
+*/
+/**************************************************************************/
+  inline bool setSensorForcedModeSettings(uint8_t TemperatureOversampling = BMP3_NO_OVERSAMPLING, uint8_t PressureOversampling = BMP3_NO_OVERSAMPLING, uint8_t IIRFilter = BMP3_IIR_FILTER_DISABLE){
+    return setConfig(TemperatureOversampling, PressureOversampling, IIRFilter);
+  };
+
+  /**************************************************************************/
+/*!
+    @brief Put the sensor in normal mode with desired settings. if success, sensor start measurement at defined rate.
+    Call performReading() or readAltitude() to get datas.
+    Set DataReadyInterrupt to true to listen when data ready (INT pin)
+
+    @param TemperatureOversampling        default BMP3_NO_OVERSAMPLING
+    @param PressureOversampling           default BMP3_NO_OVERSAMPLING
+    @param IIRFilter                      default BMP3_IIR_FILTER_DISABLE
+    @param OutputDataRate                 default BMP3_ODR_200_HZ
+    @param DataReadyInterrupt             default false
+
+    @return True on success, False on failure
+*/
+/**************************************************************************/
+  inline bool setSensorNormalModeSettings(uint8_t TemperatureOversampling = BMP3_NO_OVERSAMPLING, uint8_t PressureOversampling = BMP3_NO_OVERSAMPLING, uint8_t IIRFilter = BMP3_IIR_FILTER_DISABLE, uint8_t OutputDataRate = BMP3_ODR_200_HZ, bool DataReadyInterrupt = false){
+    return setConfig(TemperatureOversampling, PressureOversampling, IIRFilter, BMP3_NORMAL_MODE, OutputDataRate, DataReadyInterrupt);
+  };
+
+  /// put sensor in sleep mode
+  bool setSensorInSleepMode();
+  
   /// Perform a reading in blocking mode
   bool performReading(void);
 
@@ -78,6 +108,14 @@ private:
   unsigned long _meas_end;
 
   uint8_t spixfer(uint8_t x);
+  bool setConfig(
+      uint8_t TemperatureOversampling = BMP3_NO_OVERSAMPLING,
+      uint8_t PressureOversampling = BMP3_NO_OVERSAMPLING,
+      uint8_t IIRFilter = BMP3_IIR_FILTER_DISABLE,
+      uint8_t PowerMode = BMP3_FORCED_MODE,
+      uint8_t OutputDataRate = BMP3_ODR_200_HZ,
+      bool DataReadyInterrupt = false
+  );
 
   struct bmp3_dev the_sensor;
 };
