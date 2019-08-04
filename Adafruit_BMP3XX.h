@@ -53,7 +53,7 @@ public:
   float readPressure(void);
   float getSeaLevelPressure(double atmospheriquePressure, double YourActualAltitude);
   float readAltitude(float seaLevel);
-  double getAltitude(double pressure, double seaLevelPressure = 101325);
+  double getAltitude(double atmospheriquePressure, double seaLevelPressure = 101325);
 
 /**************************************************************************/
 /*!
@@ -88,9 +88,8 @@ public:
   inline bool setSensorNormalModeSettings(uint8_t TemperatureOversampling = BMP3_NO_OVERSAMPLING, uint8_t PressureOversampling = BMP3_NO_OVERSAMPLING, uint8_t IIRFilter = BMP3_IIR_FILTER_DISABLE, uint8_t OutputDataRate = BMP3_ODR_200_HZ, bool DataReadyInterrupt = false){
     return setConfig(TemperatureOversampling, PressureOversampling, IIRFilter, BMP3_NORMAL_MODE, OutputDataRate, DataReadyInterrupt);
   };
-
   /// put sensor in sleep mode
-  bool setSensorInSleepMode();
+  bool setSensorInSleepMode(void);
   
   /// Perform a reading in blocking mode
   bool performReading(void);

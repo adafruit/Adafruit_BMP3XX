@@ -410,6 +410,12 @@ static void delay_msec(uint32_t ms){
   delay(ms);
 }
 
+/**************************************************************************/
+/*!
+    @brief put the sensor in sleep mode.
+    @return True on success, False on failure
+*/
+/**************************************************************************/
 bool Adafruit_BMP3XX::setSensorInSleepMode(){
   uint8_t rslt = BMP3_OK;
   _forcedModeEnabled = false;
@@ -544,12 +550,12 @@ float Adafruit_BMP3XX::getSeaLevelPressure(double atmospheriquePressure, double 
 /*!
     @brief Calculate altitude from Pressure & Sea level pressure
 
-    @param  [double] atmospheriquePressure      local pressure in Pa
-    @param  [double] seaLevelPressure           sea level pressure in Pa
-    @return [double] altitude in meter
+    @param atmospheriquePressure      local pressure in Pa
+    @param seaLevelPressure           sea level pressure in Pa
+    @return altitude in meter
 */
 /**************************************************************************/
-double Adafruit_BMP3XX::getAltitude(double pressure, double seaLevelPressure)
+double Adafruit_BMP3XX::getAltitude(double atmospheriquePressure, double seaLevelPressure)
 {
     return (44330.0f * (1.0f - pow((double)pressure / (double)seaLevelPressure, 0.1902949f)));
 }
