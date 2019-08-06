@@ -42,8 +42,7 @@
  *  Wraps the Bosch library for Arduino usage
  */
 
-class Adafruit_BMP3XX
-{
+class Adafruit_BMP3XX {
 public:
   Adafruit_BMP3XX(int8_t cspin = -1);
   Adafruit_BMP3XX(int8_t cspin, int8_t mosipin, int8_t misopin, int8_t sckpin);
