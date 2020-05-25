@@ -59,8 +59,7 @@
 
 /*! CPP guard */
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /*!
@@ -116,7 +115,8 @@ int8_t bmp3_soft_reset(const struct bmp3_dev *dev);
  * @return Result of API execution status
  * @retval zero -> Success / +ve value -> Warning / -ve value -> Error.
  */
-int8_t bmp3_set_sensor_settings(uint32_t desired_settings, struct bmp3_dev *dev);
+int8_t bmp3_set_sensor_settings(uint32_t desired_settings,
+                                struct bmp3_dev *dev);
 
 /*!
  * @brief This API gets the power control(power mode, pressure enable and
@@ -187,7 +187,8 @@ int8_t bmp3_get_op_mode(uint8_t *op_mode, const struct bmp3_dev *dev);
  * @return Result of API execution status
  * @retval zero -> Success / +ve value -> Warning / -ve value -> Error
  */
-int8_t bmp3_get_sensor_data(uint8_t sensor_comp, struct bmp3_data *data, struct bmp3_dev *dev);
+int8_t bmp3_get_sensor_data(uint8_t sensor_comp, struct bmp3_data *data,
+                            struct bmp3_dev *dev);
 
 /*!
  * @brief This API writes the given data to the register address
@@ -202,7 +203,8 @@ int8_t bmp3_get_sensor_data(uint8_t sensor_comp, struct bmp3_data *data, struct 
  * @return Result of API execution status
  * @retval zero -> Success / +ve value -> Warning / -ve value -> Error
  */
-int8_t bmp3_set_regs(uint8_t *reg_addr, const uint8_t *reg_data, uint8_t len, const struct bmp3_dev *dev);
+int8_t bmp3_set_regs(uint8_t *reg_addr, const uint8_t *reg_data, uint8_t len,
+                     const struct bmp3_dev *dev);
 
 /*!
  * @brief This API reads the data from the given register address of the sensor.
@@ -215,7 +217,8 @@ int8_t bmp3_set_regs(uint8_t *reg_addr, const uint8_t *reg_data, uint8_t len, co
  * @return Result of API execution status
  * @retval zero -> Success / +ve value -> Warning / -ve value -> Error
  */
-int8_t bmp3_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t length, const struct bmp3_dev *dev);
+int8_t bmp3_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t length,
+                     const struct bmp3_dev *dev);
 
 /*!
  * @brief This API sets the fifo_config_1(fifo_mode,
@@ -246,7 +249,8 @@ int8_t bmp3_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t length, const
  * @return Result of API execution status
  * @retval zero -> Success / +ve value -> Warning / -ve value -> Error.
  */
-int8_t bmp3_set_fifo_settings(uint16_t desired_settings, const struct bmp3_dev *dev);
+int8_t bmp3_set_fifo_settings(uint16_t desired_settings,
+                              const struct bmp3_dev *dev);
 
 /*!
  * @brief This API gets the fifo_config_1(fifo_mode,
@@ -328,4 +332,3 @@ int8_t bmp3_set_fifo_watermark(const struct bmp3_dev *dev);
 
 #endif /* BMP3_H_ */
 /** @}*/
-
