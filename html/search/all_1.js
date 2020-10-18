@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['adafruit_5fbmp3xx',['Adafruit_BMP3XX',['../class_adafruit___b_m_p3_x_x.html',1,'Adafruit_BMP3XX'],['../class_adafruit___b_m_p3_x_x.html#ad834aea1c63ab421040093dc21131ce6',1,'Adafruit_BMP3XX::Adafruit_BMP3XX(int8_t cspin=-1)'],['../class_adafruit___b_m_p3_x_x.html#af92debfed3efb256f21b0a035fa63eb5',1,'Adafruit_BMP3XX::Adafruit_BMP3XX(int8_t cspin, int8_t mosipin, int8_t misopin, int8_t sckpin)']]],
-  ['adafruit_5fbmp3xx_2ecpp',['Adafruit_BMP3XX.cpp',['../_adafruit___b_m_p3_x_x_8cpp.html',1,'']]],
-  ['adafruit_5fbmp3xx_2eh',['Adafruit_BMP3XX.h',['../_adafruit___b_m_p3_x_x_8h.html',1,'']]],
-  ['adafruit_20bmp3xx_20temperature_20_26_20barometric_20pressure_20sensor_20driver',['Adafruit BMP3XX temperature &amp; barometric pressure sensor driver',['../index.html',1,'']]],
-  ['adafruit_5fbmp3xx_20_5b_21_5bbuild_20status_5d_28https_3a_2f_2fgithub_2ecom_2fadafruit_2fadafruit_5fbmp3xx_2fworkflows_2farduino_2520library_2520ci_2fbadge_2esvg_29_5d_28https_3a_2f_2fgithub_2ecom_2fadafruit_2fadafruit_5fbmp3xx_2factions_29',['Adafruit_BMP3XX [![Build Status](https://github.com/adafruit/Adafruit_BMP3XX/workflows/Arduino%20Library%20CI/badge.svg)](https://github.com/adafruit/Adafruit_BMP3XX/actions)',['../md__r_e_a_d_m_e.html',1,'']]]
+  ['begin_5fi2c',['begin_I2C',['../class_adafruit___b_m_p3_x_x.html#aeb1ce5bf3ef63601de4cb09ca0fd7034',1,'Adafruit_BMP3XX']]],
+  ['begin_5fspi',['begin_SPI',['../class_adafruit___b_m_p3_x_x.html#abd8e357b87ab768c538e7156fd36136a',1,'Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI=&amp;SPI)'],['../class_adafruit___b_m_p3_x_x.html#a7b0d11d50c71e0f65ef45cedfdc783e9',1,'Adafruit_BMP3XX::begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin, int8_t mosi_pin)']]],
+  ['bmp3xx_5fdefault_5faddress',['BMP3XX_DEFAULT_ADDRESS',['../_adafruit___b_m_p3_x_x_8h.html#aa075df147fcdbb640ffc929d03834d55',1,'Adafruit_BMP3XX.h']]],
+  ['bmp3xx_5fdefault_5fspifreq',['BMP3XX_DEFAULT_SPIFREQ',['../_adafruit___b_m_p3_x_x_8h.html#a62d27a4042a0b28b262306cb8970290d',1,'Adafruit_BMP3XX.h']]]
 ];

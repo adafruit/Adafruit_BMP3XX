@@ -71,15 +71,19 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad834aea1c63ab421040093dc21131ce6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___b_m_p3_x_x.html#ad834aea1c63ab421040093dc21131ce6">Adafruit_BMP3XX</a> (int8_t cspin=-1)</td></tr>
-<tr class="memdesc:ad834aea1c63ab421040093dc21131ce6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiates sensor with Hardware SPI or I2C.  <a href="#ad834aea1c63ab421040093dc21131ce6">More...</a><br /></td></tr>
-<tr class="separator:ad834aea1c63ab421040093dc21131ce6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af92debfed3efb256f21b0a035fa63eb5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___b_m_p3_x_x.html#af92debfed3efb256f21b0a035fa63eb5">Adafruit_BMP3XX</a> (int8_t cspin, int8_t mosipin, int8_t misopin, int8_t sckpin)</td></tr>
-<tr class="memdesc:af92debfed3efb256f21b0a035fa63eb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiates sensor with Software (bit-bang) SPI.  <a href="#af92debfed3efb256f21b0a035fa63eb5">More...</a><br /></td></tr>
-<tr class="separator:af92debfed3efb256f21b0a035fa63eb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56385c2e50f6c9fa7e59fdfb44a73da4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___b_m_p3_x_x.html#a56385c2e50f6c9fa7e59fdfb44a73da4">begin</a> (uint8_t addr=<a class="el" href="_adafruit___b_m_p3_x_x_8h.html#aa075df147fcdbb640ffc929d03834d55">BMP3XX_DEFAULT_ADDRESS</a>, TwoWire *theWire=&amp;Wire)</td></tr>
-<tr class="memdesc:a56385c2e50f6c9fa7e59fdfb44a73da4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the sensor.  <a href="#a56385c2e50f6c9fa7e59fdfb44a73da4">More...</a><br /></td></tr>
-<tr class="separator:a56385c2e50f6c9fa7e59fdfb44a73da4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a9202db376246e4b8d192ddeed9468a"><td class="memItemLeft" align="right" valign="top"><a id="a0a9202db376246e4b8d192ddeed9468a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___b_m_p3_x_x.html#a0a9202db376246e4b8d192ddeed9468a">Adafruit_BMP3XX</a> ()</td></tr>
+<tr class="memdesc:a0a9202db376246e4b8d192ddeed9468a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiates sensor. <br /></td></tr>
+<tr class="separator:a0a9202db376246e4b8d192ddeed9468a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb1ce5bf3ef63601de4cb09ca0fd7034"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___b_m_p3_x_x.html#aeb1ce5bf3ef63601de4cb09ca0fd7034">begin_I2C</a> (uint8_t addr=<a class="el" href="_adafruit___b_m_p3_x_x_8h.html#aa075df147fcdbb640ffc929d03834d55">BMP3XX_DEFAULT_ADDRESS</a>, TwoWire *theWire=&amp;Wire)</td></tr>
+<tr class="memdesc:aeb1ce5bf3ef63601de4cb09ca0fd7034"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the sensor.  <a href="#aeb1ce5bf3ef63601de4cb09ca0fd7034">More...</a><br /></td></tr>
+<tr class="separator:aeb1ce5bf3ef63601de4cb09ca0fd7034"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd8e357b87ab768c538e7156fd36136a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___b_m_p3_x_x.html#abd8e357b87ab768c538e7156fd36136a">begin_SPI</a> (uint8_t cs_pin, SPIClass *theSPI=&amp;SPI)</td></tr>
+<tr class="memdesc:abd8e357b87ab768c538e7156fd36136a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the hardware and initializes hardware SPI.  <a href="#abd8e357b87ab768c538e7156fd36136a">More...</a><br /></td></tr>
+<tr class="separator:abd8e357b87ab768c538e7156fd36136a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b0d11d50c71e0f65ef45cedfdc783e9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___b_m_p3_x_x.html#a7b0d11d50c71e0f65ef45cedfdc783e9">begin_SPI</a> (int8_t cs_pin, int8_t sck_pin, int8_t miso_pin, int8_t mosi_pin)</td></tr>
+<tr class="memdesc:a7b0d11d50c71e0f65ef45cedfdc783e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the hardware and initializes software SPI.  <a href="#a7b0d11d50c71e0f65ef45cedfdc783e9">More...</a><br /></td></tr>
+<tr class="separator:a7b0d11d50c71e0f65ef45cedfdc783e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9182a89f2ec135146982cdb85673fa9"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___b_m_p3_x_x.html#ad9182a89f2ec135146982cdb85673fa9">readTemperature</a> (void)</td></tr>
 <tr class="memdesc:ad9182a89f2ec135146982cdb85673fa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a reading and returns the ambient temperature.  <a href="#ad9182a89f2ec135146982cdb85673fa9">More...</a><br /></td></tr>
 <tr class="separator:ad9182a89f2ec135146982cdb85673fa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -118,93 +122,15 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="class_adafruit___b_m_p3_x_x.html">Adafruit_BMP3XX</a> Class for both I2C and SPI usage. Wraps the Bosch library for Arduino usage </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad834aea1c63ab421040093dc21131ce6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad834aea1c63ab421040093dc21131ce6">&#9670;&nbsp;</a></span>Adafruit_BMP3XX() <span class="overload">[1/2]</span></h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aeb1ce5bf3ef63601de4cb09ca0fd7034"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb1ce5bf3ef63601de4cb09ca0fd7034">&#9670;&nbsp;</a></span>begin_I2C()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Adafruit_BMP3XX::Adafruit_BMP3XX </td>
-          <td>(</td>
-          <td class="paramtype">int8_t&#160;</td>
-          <td class="paramname"><em>cspin</em> = <code>-1</code></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Instantiates sensor with Hardware SPI or I2C. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">cspin</td><td>SPI chip select. If not passed in, I2C will be used </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="af92debfed3efb256f21b0a035fa63eb5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af92debfed3efb256f21b0a035fa63eb5">&#9670;&nbsp;</a></span>Adafruit_BMP3XX() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Adafruit_BMP3XX::Adafruit_BMP3XX </td>
-          <td>(</td>
-          <td class="paramtype">int8_t&#160;</td>
-          <td class="paramname"><em>cspin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int8_t&#160;</td>
-          <td class="paramname"><em>mosipin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int8_t&#160;</td>
-          <td class="paramname"><em>misopin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int8_t&#160;</td>
-          <td class="paramname"><em>sckpin</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Instantiates sensor with Software (bit-bang) SPI. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">cspin</td><td>SPI chip select </td></tr>
-    <tr><td class="paramname">mosipin</td><td>SPI MOSI (Data from microcontroller to sensor) </td></tr>
-    <tr><td class="paramname">misopin</td><td>SPI MISO (Data to microcontroller from sensor) </td></tr>
-    <tr><td class="paramname">sckpin</td><td>SPI Clock </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="a56385c2e50f6c9fa7e59fdfb44a73da4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56385c2e50f6c9fa7e59fdfb44a73da4">&#9670;&nbsp;</a></span>begin()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Adafruit_BMP3XX::begin </td>
+          <td class="memname">bool Adafruit_BMP3XX::begin_I2C </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>addr</em> = <code><a class="el" href="_adafruit___b_m_p3_x_x_8h.html#aa075df147fcdbb640ffc929d03834d55">BMP3XX_DEFAULT_ADDRESS</a></code>, </td>
@@ -233,6 +159,96 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True on sensor initialization success. False on failure. </dd></dl>
+
+</div>
+</div>
+<a id="abd8e357b87ab768c538e7156fd36136a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd8e357b87ab768c538e7156fd36136a">&#9670;&nbsp;</a></span>begin_SPI() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_BMP3XX::begin_SPI </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>cs_pin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SPIClass *&#160;</td>
+          <td class="paramname"><em>theSPI</em> = <code>&amp;SPI</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets up the hardware and initializes hardware SPI. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cs_pin</td><td>The arduino pin # connected to chip select </td></tr>
+    <tr><td class="paramname">theSPI</td><td>The SPI object to be used for SPI connections. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if initialization was successful, otherwise false. </dd></dl>
+
+</div>
+</div>
+<a id="a7b0d11d50c71e0f65ef45cedfdc783e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b0d11d50c71e0f65ef45cedfdc783e9">&#9670;&nbsp;</a></span>begin_SPI() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_BMP3XX::begin_SPI </td>
+          <td>(</td>
+          <td class="paramtype">int8_t&#160;</td>
+          <td class="paramname"><em>cs_pin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int8_t&#160;</td>
+          <td class="paramname"><em>sck_pin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int8_t&#160;</td>
+          <td class="paramname"><em>miso_pin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int8_t&#160;</td>
+          <td class="paramname"><em>mosi_pin</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets up the hardware and initializes software SPI. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cs_pin</td><td>The arduino pin # connected to chip select </td></tr>
+    <tr><td class="paramname">sck_pin</td><td>The arduino pin # connected to SPI clock </td></tr>
+    <tr><td class="paramname">miso_pin</td><td>The arduino pin # connected to SPI MISO </td></tr>
+    <tr><td class="paramname">mosi_pin</td><td>The arduino pin # connected to SPI MOSI </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if initialization was successful, otherwise false. </dd></dl>
 
 </div>
 </div>

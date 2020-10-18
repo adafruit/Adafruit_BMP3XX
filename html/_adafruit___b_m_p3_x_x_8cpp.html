@@ -59,50 +59,26 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#define-members">Macros</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">Adafruit_BMP3XX.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;Arduino.h&quot;</code><br />
-<code>#include &quot;<a class="el" href="_adafruit___b_m_p3_x_x_8h_source.html">Adafruit_BMP3XX.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="_adafruit___b_m_p3_x_x_8h_source.html">Adafruit_BMP3XX.h</a>&quot;</code><br />
+<code>#include &quot;Arduino.h&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:acd3413b5ef377f1c9edba09ee1e94e3c"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___b_m_p3_x_x_8cpp.html#acd3413b5ef377f1c9edba09ee1e94e3c">_BMP3_SoftwareSPI_MOSI</a></td></tr>
-<tr class="memdesc:acd3413b5ef377f1c9edba09ee1e94e3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">! These SPI pins must be global in order to work with underlying library  <a href="#acd3413b5ef377f1c9edba09ee1e94e3c">More...</a><br /></td></tr>
-<tr class="separator:acd3413b5ef377f1c9edba09ee1e94e3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2985031e998f9f2e2df90ce7363f6f9"><td class="memItemLeft" align="right" valign="top"><a id="ab2985031e998f9f2e2df90ce7363f6f9"></a>
-int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___b_m_p3_x_x_8cpp.html#ab2985031e998f9f2e2df90ce7363f6f9">_BMP3_SoftwareSPI_MISO</a></td></tr>
-<tr class="memdesc:ab2985031e998f9f2e2df90ce7363f6f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global SPI MISO pin. <br /></td></tr>
-<tr class="separator:ab2985031e998f9f2e2df90ce7363f6f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8539049be90596567b4fe395a2350e7"><td class="memItemLeft" align="right" valign="top"><a id="ab8539049be90596567b4fe395a2350e7"></a>
-int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___b_m_p3_x_x_8cpp.html#ab8539049be90596567b4fe395a2350e7">_BMP3_SoftwareSPI_SCK</a></td></tr>
-<tr class="memdesc:ab8539049be90596567b4fe395a2350e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global SPI Clock pin. <br /></td></tr>
-<tr class="separator:ab8539049be90596567b4fe395a2350e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a571d4809f95857c9504f871dc35bfe12"><td class="memItemLeft" align="right" valign="top"><a id="a571d4809f95857c9504f871dc35bfe12"></a>
-TwoWire *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___b_m_p3_x_x_8cpp.html#a571d4809f95857c9504f871dc35bfe12">_BMP3_i2c</a></td></tr>
-<tr class="memdesc:a571d4809f95857c9504f871dc35bfe12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global I2C interface pointer. <br /></td></tr>
-<tr class="separator:a571d4809f95857c9504f871dc35bfe12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af74b2acb5c80bf27f6ffed759e4067c7"><td class="memItemLeft" align="right" valign="top"><a id="af74b2acb5c80bf27f6ffed759e4067c7"></a>
+Adafruit_I2CDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___b_m_p3_x_x_8cpp.html#af74b2acb5c80bf27f6ffed759e4067c7">i2c_dev</a> = NULL</td></tr>
+<tr class="memdesc:af74b2acb5c80bf27f6ffed759e4067c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global I2C interface pointer. <br /></td></tr>
+<tr class="separator:af74b2acb5c80bf27f6ffed759e4067c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27c0d8ef0f97fe3dc0725a4315412a83"><td class="memItemLeft" align="right" valign="top"><a id="a27c0d8ef0f97fe3dc0725a4315412a83"></a>
+Adafruit_SPIDevice *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_adafruit___b_m_p3_x_x_8cpp.html#a27c0d8ef0f97fe3dc0725a4315412a83">spi_dev</a> = NULL</td></tr>
+<tr class="memdesc:a27c0d8ef0f97fe3dc0725a4315412a83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global SPI interface pointer. <br /></td></tr>
+<tr class="separator:a27c0d8ef0f97fe3dc0725a4315412a83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="acd3413b5ef377f1c9edba09ee1e94e3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd3413b5ef377f1c9edba09ee1e94e3c">&#9670;&nbsp;</a></span>_BMP3_SoftwareSPI_MOSI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int8_t _BMP3_SoftwareSPI_MOSI</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>! These SPI pins must be global in order to work with underlying library </p>
-<p>Global SPI MOSI pin </p>
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
