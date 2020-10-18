@@ -28,13 +28,13 @@
 #include "Arduino.h"
 #include "Adafruit_BMP3XX.h"
 
-//#define BMP3XX_DEBUG
+#define BMP3XX_DEBUG
 
 ///! These SPI pins must be global in order to work with underlying library
 int8_t _BMP3_SoftwareSPI_MOSI; ///< Global SPI MOSI pin
 int8_t _BMP3_SoftwareSPI_MISO; ///< Global SPI MISO pin
 int8_t _BMP3_SoftwareSPI_SCK;  ///< Global SPI Clock pin
-TwoWire *_BMP3_i2c;            ///< Global I2C interface pointer
+Adafruit_I2CDevice *i2c_dev = NULL;  ///< Global I2C interface pointer
 
 // Our hardware interface functions
 static int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
@@ -98,12 +98,16 @@ Adafruit_BMP3XX::Adafruit_BMP3XX(int8_t cspin, int8_t mosipin, int8_t misopin, i
 */
 /**************************************************************************/
 bool Adafruit_BMP3XX::begin(uint8_t addr, TwoWire *theWire) {
-  _i2caddr = addr;
-
   if (_cs == -1) {
     // i2c
-    _BMP3_i2c = theWire;
-    _BMP3_i2c->begin();
+    if (!i2c_dev) {
+      i2c_dev = new Adafruit_I2CDevice(addr, theWire);
+    }
+
+    // verify i2c address was found
+    if (!i2c_dev->begin()) {
+      return false;
+    }
 
     the_sensor.dev_id = addr;
     the_sensor.intf = BMP3_I2C_INTF;
@@ -380,29 +384,10 @@ bool Adafruit_BMP3XX::setOutputDataRate(uint8_t odr) {
 */
 /**************************************************************************/
 int8_t i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len) {
-#ifdef BMP3XX_DEBUG
-  Serial.print("\tI2C $"); Serial.print(reg_addr, HEX); Serial.print(" => ");
-#endif
-
-  _BMP3_i2c->beginTransmission((uint8_t)dev_id);
-  _BMP3_i2c->write((uint8_t)reg_addr);
-  _BMP3_i2c->endTransmission();
-  if (len != _BMP3_i2c->requestFrom((uint8_t)dev_id, (byte)len)) {
-#ifdef BMP3XX_DEBUG
-    Serial.print("Failed to read "); Serial.print(len); Serial.print(" bytes from "); Serial.println(dev_id, HEX);
-#endif
+  
+  if ( ! i2c_dev->write_then_read(&reg_addr, 1, reg_data, len)) 
     return 1;
-  }
-  while (len--) {
-    *reg_data = (uint8_t)_BMP3_i2c->read();
-#ifdef BMP3XX_DEBUG
-    Serial.print("0x"); Serial.print(*reg_data, HEX); Serial.print(", ");
-#endif
-    reg_data++;
-  }
-#ifdef BMP3XX_DEBUG
-  Serial.println("");
-#endif
+
   return 0;
 }
 
@@ -412,22 +397,9 @@ int8_t i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t le
 */
 /**************************************************************************/
 int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len) {
-#ifdef BMP3XX_DEBUG
-  Serial.print("\tI2C $"); Serial.print(reg_addr, HEX); Serial.print(" <= ");
-#endif
-  _BMP3_i2c->beginTransmission((uint8_t)dev_id);
-  _BMP3_i2c->write((uint8_t)reg_addr);
-  while (len--) {
-    _BMP3_i2c->write(*reg_data);
-#ifdef BMP3XX_DEBUG
-    Serial.print("0x"); Serial.print(*reg_data, HEX); Serial.print(", ");
-#endif
-    reg_data++;
-  }
-  _BMP3_i2c->endTransmission();
-#ifdef BMP3XX_DEBUG
-  Serial.println("");
-#endif
+  if ( ! i2c_dev->write(reg_data, len, false, &reg_addr, 1)) 
+    return 1;
+
   return 0;
 }
 
