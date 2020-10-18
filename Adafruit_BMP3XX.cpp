@@ -51,8 +51,7 @@ static void delay_msec(uint32_t ms);
 
 /**************************************************************************/
 /*!
-    @brief  Instantiates sensor with Hardware SPI or I2C.
-    @param  cspin SPI chip select. If not passed in, I2C will be used
+    @brief  Instantiates sensor
 */
 /**************************************************************************/
 Adafruit_BMP3XX::Adafruit_BMP3XX(void) {
