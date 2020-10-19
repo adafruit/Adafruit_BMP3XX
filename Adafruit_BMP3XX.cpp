@@ -34,13 +34,13 @@ Adafruit_I2CDevice *i2c_dev = NULL; ///< Global I2C interface pointer
 Adafruit_SPIDevice *spi_dev = NULL; ///< Global SPI interface pointer
 
 // Our hardware interface functions
-static int8_t i2c_write(uint8_t reg_addr, uint8_t *reg_data,
+static int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
                         uint32_t len, void *intf_ptr);
 static int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data,
                        uint32_t len, void *intf_ptr);
 static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data,
                        uint32_t len, void *intf_ptr);
-static int8_t spi_write(uint8_t reg_addr, uint8_t *reg_data,
+static int8_t spi_write(uint8_t reg_addr, const uint8_t *reg_data,
                         uint32_t len, void *intf_ptr);
 static void delay_usec(uint32_t us, void *intf_ptr);
 static int8_t validate_trimming_param(struct bmp3_dev *dev);
@@ -485,12 +485,12 @@ int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data,
     @brief  Writes 8 bit values over I2C
 */
 /**************************************************************************/
-int8_t i2c_write(uint8_t reg_addr, uint8_t *reg_data,
+int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
                  uint32_t len, void *intf_ptr) {
   //Serial.print("I2C write address 0x"); Serial.print(reg_addr, HEX);
   //Serial.print(" len "); Serial.println(len, HEX);
 
-  if (!i2c_dev->write(reg_data, len, false, &reg_addr, 1))
+  if (!i2c_dev->write((uint8_t *)reg_data, len, false, &reg_addr, 1))
     return 1;
 
   return 0;
@@ -514,9 +514,9 @@ static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data,
     @brief  Writes 8 bit values over SPI
 */
 /**************************************************************************/
-static int8_t spi_write(uint8_t reg_addr, uint8_t *reg_data,
+static int8_t spi_write(uint8_t reg_addr, const uint8_t *reg_data,
                         uint32_t len, void *intf_ptr) {
-  spi_dev->write(reg_data, len, &reg_addr, 1);
+  spi_dev->write((uint8_t *)reg_data, len, &reg_addr, 1);
 
   return 0;
 }
