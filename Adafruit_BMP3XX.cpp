@@ -28,22 +28,23 @@
 #include "Adafruit_BMP3XX.h"
 #include "Arduino.h"
 
-#define BMP3XX_DEBUG
+//#define BMP3XX_DEBUG
 
 Adafruit_I2CDevice *i2c_dev = NULL; ///< Global I2C interface pointer
 Adafruit_SPIDevice *spi_dev = NULL; ///< Global SPI interface pointer
 
 // Our hardware interface functions
-static int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
-                        uint16_t len);
-static int8_t i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
-                       uint16_t len);
-static int8_t spi_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
-                       uint16_t len);
-static int8_t spi_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
-                        uint16_t len);
-static uint8_t spi_transfer(uint8_t x);
-static void delay_msec(uint32_t ms);
+static int8_t i2c_write(uint8_t reg_addr, uint8_t *reg_data,
+                        uint32_t len, void *intf_ptr);
+static int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data,
+                       uint32_t len, void *intf_ptr);
+static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data,
+                       uint32_t len, void *intf_ptr);
+static int8_t spi_write(uint8_t reg_addr, uint8_t *reg_data,
+                        uint32_t len, void *intf_ptr);
+static void delay_usec(uint32_t us, void *intf_ptr);
+static int8_t validate_trimming_param(struct bmp3_dev *dev);
+static int8_t cal_crc(uint8_t seed, uint8_t data);
 
 /***************************************************************************
  PUBLIC FUNCTIONS
@@ -86,10 +87,11 @@ bool Adafruit_BMP3XX::begin_I2C(uint8_t addr, TwoWire *theWire) {
     return false;
   }
 
-  the_sensor.dev_id = addr;
+  the_sensor.chip_id = addr;
   the_sensor.intf = BMP3_I2C_INTF;
   the_sensor.read = &i2c_read;
   the_sensor.write = &i2c_write;
+  the_sensor.intf_ptr = i2c_dev;
 
   return _init();
 }
@@ -117,7 +119,7 @@ bool Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI) {
     return false;
   }
 
-  the_sensor.dev_id = cs_pin;
+  the_sensor.chip_id = cs_pin;
   the_sensor.intf = BMP3_SPI_INTF;
   the_sensor.read = &spi_read;
   the_sensor.write = &spi_write;
@@ -150,7 +152,7 @@ bool Adafruit_BMP3XX::begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
     return false;
   }
 
-  the_sensor.dev_id = cs_pin;
+  the_sensor.chip_id = cs_pin;
   the_sensor.intf = BMP3_SPI_INTF;
   the_sensor.read = &spi_read;
   the_sensor.write = &spi_write;
@@ -159,12 +161,28 @@ bool Adafruit_BMP3XX::begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
 }
 
 bool Adafruit_BMP3XX::_init(void) {
-  the_sensor.delay_ms = delay_msec;
-
+  the_sensor.delay_us = delay_usec;
   int8_t rslt = BMP3_OK;
+
+
+  /* Reset the sensor */
+  rslt = bmp3_soft_reset(&the_sensor);
+#ifdef BMP3XX_DEBUG
+  Serial.print("Reset result: ");
+  Serial.println(rslt);
+#endif
+  if (rslt != BMP3_OK)
+    return false;
+
   rslt = bmp3_init(&the_sensor);
 #ifdef BMP3XX_DEBUG
-  Serial.print("Result: ");
+  Serial.print("Init result: ");
+  Serial.println(rslt);
+#endif
+
+  rslt = validate_trimming_param(&the_sensor);
+#ifdef BMP3XX_DEBUG
+  Serial.print("Valtrim result: ");
   Serial.println(rslt);
 #endif
 
@@ -207,9 +225,10 @@ bool Adafruit_BMP3XX::_init(void) {
   setTemperatureOversampling(BMP3_NO_OVERSAMPLING);
   setPressureOversampling(BMP3_NO_OVERSAMPLING);
   setIIRFilterCoeff(BMP3_IIR_FILTER_DISABLE);
-
+  setOutputDataRate(BMP3_ODR_25_HZ);
+ 
   // don't do anything till we request a reading
-  the_sensor.settings.op_mode = BMP3_FORCED_MODE;
+  the_sensor.settings.op_mode = BMP3_MODE_FORCED;
 
   return true;
 }
@@ -278,25 +297,25 @@ bool Adafruit_BMP3XX::performReading(void) {
 
   /* Select the pressure and temperature sensor to be enabled */
   the_sensor.settings.temp_en = BMP3_ENABLE;
-  settings_sel |= BMP3_TEMP_EN_SEL;
+  settings_sel |= BMP3_SEL_TEMP_EN;
   sensor_comp |= BMP3_TEMP;
   if (_tempOSEnabled) {
-    settings_sel |= BMP3_TEMP_OS_SEL;
+    settings_sel |= BMP3_SEL_TEMP_OS;
   }
 
   the_sensor.settings.press_en = BMP3_ENABLE;
-  settings_sel |= BMP3_PRESS_EN_SEL;
+  settings_sel |= BMP3_SEL_PRESS_EN;
   sensor_comp |= BMP3_PRESS;
   if (_presOSEnabled) {
-    settings_sel |= BMP3_PRESS_OS_SEL;
+    settings_sel |= BMP3_SEL_PRESS_OS;
   }
 
   if (_filterEnabled) {
-    settings_sel |= BMP3_IIR_FILTER_SEL;
+    settings_sel |= BMP3_SEL_IIR_FILTER;
   }
 
   if (_ODREnabled) {
-    settings_sel |= BMP3_ODR_SEL;
+    settings_sel |= BMP3_SEL_ODR;
   }
 
   // set interrupt to data ready
@@ -307,30 +326,45 @@ bool Adafruit_BMP3XX::performReading(void) {
   Serial.println("Setting sensor settings");
 #endif
   rslt = bmp3_set_sensor_settings(settings_sel, &the_sensor);
+
   if (rslt != BMP3_OK)
     return false;
 
   /* Set the power mode */
-  the_sensor.settings.op_mode = BMP3_FORCED_MODE;
+  the_sensor.settings.op_mode = BMP3_MODE_FORCED;
 #ifdef BMP3XX_DEBUG
-  Serial.println("Setting power mode");
+  Serial.println(F("Setting power mode"));
 #endif
   rslt = bmp3_set_op_mode(&the_sensor);
   if (rslt != BMP3_OK)
     return false;
+
+  delay(40);
 
   /* Variable used to store the compensated data */
   struct bmp3_data data;
 
   /* Temperature and Pressure data are read and stored in the bmp3_data instance
    */
+#ifdef BMP3XX_DEBUG
+  Serial.println(F("Getting sensor data"));
+#endif
   rslt = bmp3_get_sensor_data(sensor_comp, &data, &the_sensor);
+  if (rslt != BMP3_OK)
+    return false;
+
+  /*
+#ifdef BMP3XX_DEBUG
+  Serial.println(F("Analyzing sensor data"));
+#endif
+  rslt = analyze_sensor_data(&data);
+  if (rslt != BMP3_OK)
+    return false;
+    */
 
   /* Save the temperature and pressure data */
   temperature = data.temperature;
   pressure = data.pressure;
-  if (rslt != BMP3_OK)
-    return false;
 
   return true;
 }
@@ -435,8 +469,10 @@ bool Adafruit_BMP3XX::setOutputDataRate(uint8_t odr) {
     @brief  Reads 8 bit values over I2C
 */
 /**************************************************************************/
-int8_t i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
-                uint16_t len) {
+int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data,
+                uint32_t len, void *intf_ptr) {
+  //Serial.print("I2C read address 0x"); Serial.print(reg_addr, HEX);
+  //Serial.print(" len "); Serial.println(len, HEX);
 
   if (!i2c_dev->write_then_read(&reg_addr, 1, reg_data, len))
     return 1;
@@ -449,8 +485,11 @@ int8_t i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
     @brief  Writes 8 bit values over I2C
 */
 /**************************************************************************/
-int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
-                 uint16_t len) {
+int8_t i2c_write(uint8_t reg_addr, uint8_t *reg_data,
+                 uint32_t len, void *intf_ptr) {
+  //Serial.print("I2C write address 0x"); Serial.print(reg_addr, HEX);
+  //Serial.print(" len "); Serial.println(len, HEX);
+
   if (!i2c_dev->write(reg_data, len, false, &reg_addr, 1))
     return 1;
 
@@ -462,8 +501,8 @@ int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
     @brief  Reads 8 bit values over SPI
 */
 /**************************************************************************/
-static int8_t spi_read(uint8_t cspin, uint8_t reg_addr, uint8_t *reg_data,
-                       uint16_t len) {
+static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data,
+                       uint32_t len, void *intf_ptr) {
 
   reg_addr |= 0x80;
   spi_dev->write_then_read(&reg_addr, 1, reg_data, len, 0x00);
@@ -475,16 +514,68 @@ static int8_t spi_read(uint8_t cspin, uint8_t reg_addr, uint8_t *reg_data,
     @brief  Writes 8 bit values over SPI
 */
 /**************************************************************************/
-static int8_t spi_write(uint8_t cspin, uint8_t reg_addr, uint8_t *reg_data,
-                        uint16_t len) {
+static int8_t spi_write(uint8_t reg_addr, uint8_t *reg_data,
+                        uint32_t len, void *intf_ptr) {
   spi_dev->write(reg_data, len, &reg_addr, 1);
 
   return 0;
 }
 
-static uint8_t spi_transfer(uint8_t x) {
-  spi_dev->transfer(&x, 1);
-  return x;
+static void delay_usec(uint32_t us, void *intf_ptr) { delayMicroseconds(us); }
+
+static int8_t validate_trimming_param(struct bmp3_dev *dev)
+{
+    int8_t rslt;
+    uint8_t crc = 0xFF;
+    uint8_t stored_crc;
+    uint8_t trim_param[21];
+    uint8_t i;
+
+    rslt = bmp3_get_regs(BMP3_REG_CALIB_DATA, trim_param, 21, dev);
+    if (rslt == BMP3_OK)
+    {
+        for (i = 0; i < 21; i++)
+        {
+            crc = (uint8_t)cal_crc(crc, trim_param[i]);
+        }
+
+        crc = (crc ^ 0xFF);
+        rslt = bmp3_get_regs(0x30, &stored_crc, 1, dev);
+        if (stored_crc != crc)
+        {
+            rslt = -1;
+        }
+    }
+
+    return rslt;
+
 }
 
-static void delay_msec(uint32_t ms) { delay(ms); }
+
+/*
+ * @brief function to calculate CRC for the trimming parameters
+ * */
+static int8_t cal_crc(uint8_t seed, uint8_t data)
+{
+    int8_t poly = 0x1D;
+    int8_t var2;
+    uint8_t i;
+
+    for (i = 0; i < 8; i++)
+    {
+        if ((seed & 0x80) ^ (data & 0x80))
+        {
+            var2 = 1;
+        }
+        else
+        {
+            var2 = 0;
+        }
+
+        seed = (seed & 0x7F) << 1;
+        data = (data & 0x7F) << 1;
+        seed = seed ^ (uint8_t)(poly * var2);
+    }
+
+    return (int8_t)seed;
+}

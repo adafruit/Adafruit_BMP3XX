@@ -32,7 +32,7 @@ Adafruit_BMP3XX bmp;
 void setup() {
   Serial.begin(115200);
   while (!Serial);
-  Serial.println("BMP388 test");
+  Serial.println("Adafruit BMP388 / BMP390 test");
 
   if (!bmp.begin_I2C()) {   // hardware I2C mode, can pass in address & alt Wire
   //if (! bmp.begin_SPI(BMP_CS)) {  // hardware SPI mode  
@@ -45,7 +45,7 @@ void setup() {
   bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
   bmp.setPressureOversampling(BMP3_OVERSAMPLING_4X);
   bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
-  //bmp.setOutputDataRate(BMP3_ODR_50_HZ);
+  bmp.setOutputDataRate(BMP3_ODR_50_HZ);
 }
 
 void loop() {
