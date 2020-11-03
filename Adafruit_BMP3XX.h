@@ -47,6 +47,7 @@ public:
   bool begin_SPI(uint8_t cs_pin, SPIClass *theSPI = &SPI);
   bool begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
                  int8_t mosi_pin);
+  uint8_t chipID(void);
   float readTemperature(void);
   float readPressure(void);
   float readAltitude(float seaLevel);

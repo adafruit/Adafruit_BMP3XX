@@ -34,14 +34,14 @@ Adafruit_I2CDevice *i2c_dev = NULL; ///< Global I2C interface pointer
 Adafruit_SPIDevice *spi_dev = NULL; ///< Global SPI interface pointer
 
 // Our hardware interface functions
-static int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
-                        uint32_t len, void *intf_ptr);
-static int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data,
-                       uint32_t len, void *intf_ptr);
-static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data,
-                       uint32_t len, void *intf_ptr);
-static int8_t spi_write(uint8_t reg_addr, const uint8_t *reg_data,
-                        uint32_t len, void *intf_ptr);
+static int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len,
+                        void *intf_ptr);
+static int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len,
+                       void *intf_ptr);
+static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len,
+                       void *intf_ptr);
+static int8_t spi_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len,
+                        void *intf_ptr);
 static void delay_usec(uint32_t us, void *intf_ptr);
 static int8_t validate_trimming_param(struct bmp3_dev *dev);
 static int8_t cal_crc(uint8_t seed, uint8_t data);
@@ -169,7 +169,6 @@ bool Adafruit_BMP3XX::_init(void) {
   the_sensor.delay_us = delay_usec;
   int8_t rslt = BMP3_OK;
 
-
   /* Reset the sensor */
   rslt = bmp3_soft_reset(&the_sensor);
 #ifdef BMP3XX_DEBUG
@@ -231,7 +230,7 @@ bool Adafruit_BMP3XX::_init(void) {
   setPressureOversampling(BMP3_NO_OVERSAMPLING);
   setIIRFilterCoeff(BMP3_IIR_FILTER_DISABLE);
   setOutputDataRate(BMP3_ODR_25_HZ);
- 
+
   // don't do anything till we request a reading
   the_sensor.settings.op_mode = BMP3_MODE_FORCED;
 
@@ -248,6 +247,14 @@ float Adafruit_BMP3XX::readTemperature(void) {
   performReading();
   return temperature;
 }
+
+/**************************************************************************/
+/*!
+    @brief Reads the chip identifier
+    @return BMP3_CHIP_ID or BMP390_CHIP_ID
+*/
+/**************************************************************************/
+uint8_t Adafruit_BMP3XX::chipID(void) { return the_sensor.chip_id; }
 
 /**************************************************************************/
 /*!
@@ -474,10 +481,10 @@ bool Adafruit_BMP3XX::setOutputDataRate(uint8_t odr) {
     @brief  Reads 8 bit values over I2C
 */
 /**************************************************************************/
-int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data,
-                uint32_t len, void *intf_ptr) {
-  //Serial.print("I2C read address 0x"); Serial.print(reg_addr, HEX);
-  //Serial.print(" len "); Serial.println(len, HEX);
+int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len,
+                void *intf_ptr) {
+  // Serial.print("I2C read address 0x"); Serial.print(reg_addr, HEX);
+  // Serial.print(" len "); Serial.println(len, HEX);
 
   if (!i2c_dev->write_then_read(&reg_addr, 1, reg_data, len))
     return 1;
@@ -490,10 +497,10 @@ int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data,
     @brief  Writes 8 bit values over I2C
 */
 /**************************************************************************/
-int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
-                 uint32_t len, void *intf_ptr) {
-  //Serial.print("I2C write address 0x"); Serial.print(reg_addr, HEX);
-  //Serial.print(" len "); Serial.println(len, HEX);
+int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len,
+                 void *intf_ptr) {
+  // Serial.print("I2C write address 0x"); Serial.print(reg_addr, HEX);
+  // Serial.print(" len "); Serial.println(len, HEX);
 
   if (!i2c_dev->write((uint8_t *)reg_data, len, false, &reg_addr, 1))
     return 1;
@@ -506,8 +513,8 @@ int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
     @brief  Reads 8 bit values over SPI
 */
 /**************************************************************************/
-static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data,
-                       uint32_t len, void *intf_ptr) {
+static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len,
+                       void *intf_ptr) {
   spi_dev->write_then_read(&reg_addr, 1, reg_data, len, 0xFF);
   return 0;
 }
@@ -517,8 +524,8 @@ static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data,
     @brief  Writes 8 bit values over SPI
 */
 /**************************************************************************/
-static int8_t spi_write(uint8_t reg_addr, const uint8_t *reg_data,
-                        uint32_t len, void *intf_ptr) {
+static int8_t spi_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len,
+                        void *intf_ptr) {
   spi_dev->write((uint8_t *)reg_data, len, &reg_addr, 1);
 
   return 0;
@@ -526,59 +533,48 @@ static int8_t spi_write(uint8_t reg_addr, const uint8_t *reg_data,
 
 static void delay_usec(uint32_t us, void *intf_ptr) { delayMicroseconds(us); }
 
-static int8_t validate_trimming_param(struct bmp3_dev *dev)
-{
-    int8_t rslt;
-    uint8_t crc = 0xFF;
-    uint8_t stored_crc;
-    uint8_t trim_param[21];
-    uint8_t i;
+static int8_t validate_trimming_param(struct bmp3_dev *dev) {
+  int8_t rslt;
+  uint8_t crc = 0xFF;
+  uint8_t stored_crc;
+  uint8_t trim_param[21];
+  uint8_t i;
 
-    rslt = bmp3_get_regs(BMP3_REG_CALIB_DATA, trim_param, 21, dev);
-    if (rslt == BMP3_OK)
-    {
-        for (i = 0; i < 21; i++)
-        {
-            crc = (uint8_t)cal_crc(crc, trim_param[i]);
-        }
-
-        crc = (crc ^ 0xFF);
-        rslt = bmp3_get_regs(0x30, &stored_crc, 1, dev);
-        if (stored_crc != crc)
-        {
-            rslt = -1;
-        }
+  rslt = bmp3_get_regs(BMP3_REG_CALIB_DATA, trim_param, 21, dev);
+  if (rslt == BMP3_OK) {
+    for (i = 0; i < 21; i++) {
+      crc = (uint8_t)cal_crc(crc, trim_param[i]);
     }
 
-    return rslt;
+    crc = (crc ^ 0xFF);
+    rslt = bmp3_get_regs(0x30, &stored_crc, 1, dev);
+    if (stored_crc != crc) {
+      rslt = -1;
+    }
+  }
 
+  return rslt;
 }
-
 
 /*
  * @brief function to calculate CRC for the trimming parameters
  * */
-static int8_t cal_crc(uint8_t seed, uint8_t data)
-{
-    int8_t poly = 0x1D;
-    int8_t var2;
-    uint8_t i;
+static int8_t cal_crc(uint8_t seed, uint8_t data) {
+  int8_t poly = 0x1D;
+  int8_t var2;
+  uint8_t i;
 
-    for (i = 0; i < 8; i++)
-    {
-        if ((seed & 0x80) ^ (data & 0x80))
-        {
-            var2 = 1;
-        }
-        else
-        {
-            var2 = 0;
-        }
-
-        seed = (seed & 0x7F) << 1;
-        data = (data & 0x7F) << 1;
-        seed = seed ^ (uint8_t)(poly * var2);
+  for (i = 0; i < 8; i++) {
+    if ((seed & 0x80) ^ (data & 0x80)) {
+      var2 = 1;
+    } else {
+      var2 = 0;
     }
 
-    return (int8_t)seed;
+    seed = (seed & 0x7F) << 1;
+    data = (data & 0x7F) << 1;
+    seed = seed ^ (uint8_t)(poly * var2);
+  }
+
+  return (int8_t)seed;
 }
