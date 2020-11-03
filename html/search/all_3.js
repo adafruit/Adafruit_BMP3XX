@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['performreading',['performReading',['../class_adafruit___b_m_p3_x_x.html#abfb33a666d7fa5d2bb36e701f41e41fe',1,'Adafruit_BMP3XX']]],
-  ['pressure',['pressure',['../class_adafruit___b_m_p3_x_x.html#a1802ca1c0359769c1a42612687d312ac',1,'Adafruit_BMP3XX']]]
+  ['i2c_5fdev',['i2c_dev',['../_adafruit___b_m_p3_x_x_8cpp.html#af74b2acb5c80bf27f6ffed759e4067c7',1,'Adafruit_BMP3XX.cpp']]]
 ];
