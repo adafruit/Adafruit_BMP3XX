@@ -92,6 +92,7 @@ bool Adafruit_BMP3XX::begin_I2C(uint8_t addr, TwoWire *theWire) {
   the_sensor.read = &i2c_read;
   the_sensor.write = &i2c_write;
   the_sensor.intf_ptr = i2c_dev;
+  the_sensor.dummy_byte = 0;
 
   return _init();
 }
@@ -123,6 +124,8 @@ bool Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI) {
   the_sensor.intf = BMP3_SPI_INTF;
   the_sensor.read = &spi_read;
   the_sensor.write = &spi_write;
+  the_sensor.intf_ptr = spi_dev;
+  the_sensor.dummy_byte = 1;
 
   return _init();
 }
@@ -156,6 +159,8 @@ bool Adafruit_BMP3XX::begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
   the_sensor.intf = BMP3_SPI_INTF;
   the_sensor.read = &spi_read;
   the_sensor.write = &spi_write;
+  the_sensor.intf_ptr = spi_dev;
+  the_sensor.dummy_byte = 1;
 
   return _init();
 }
@@ -503,9 +508,7 @@ int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data,
 /**************************************************************************/
 static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data,
                        uint32_t len, void *intf_ptr) {
-
-  reg_addr |= 0x80;
-  spi_dev->write_then_read(&reg_addr, 1, reg_data, len, 0x00);
+  spi_dev->write_then_read(&reg_addr, 1, reg_data, len, 0xFF);
   return 0;
 }
 
