@@ -350,8 +350,7 @@ bool Adafruit_BMP3XX::performReading(void) {
   rslt = bmp3_set_op_mode(&the_sensor);
   if (rslt != BMP3_OK)
     return false;
-
-  delay(40);
+  
 
   /* Variable used to store the compensated data */
   struct bmp3_data data;
