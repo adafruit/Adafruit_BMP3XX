@@ -68,7 +68,6 @@ public:
 private:
   bool _init(void);
 
-  bool _filterEnabled, _tempOSEnabled, _presOSEnabled, _ODREnabled;
   uint8_t _i2caddr;
   int32_t _sensorID;
   int8_t _cs;

@@ -57,7 +57,7 @@ static int8_t cal_crc(uint8_t seed, uint8_t data);
 /**************************************************************************/
 Adafruit_BMP3XX::Adafruit_BMP3XX(void) {
   _meas_end = 0;
-  _filterEnabled = _tempOSEnabled = _presOSEnabled = false;
+  // _filterEnabled = _tempOSEnabled = _presOSEnabled = false;
 }
 
 /**************************************************************************/
@@ -175,8 +175,10 @@ bool Adafruit_BMP3XX::_init(void) {
   Serial.print("Reset result: ");
   Serial.println(rslt);
 #endif
-  if (rslt != BMP3_OK)
+  if (rslt != BMP3_OK){
+    Serial.println("reset failed");
     return false;
+  }
 
   rslt = bmp3_init(&the_sensor);
 #ifdef BMP3XX_DEBUG
@@ -226,13 +228,34 @@ bool Adafruit_BMP3XX::_init(void) {
   // Serial.println(the_sensor.calib_data.reg_calib_data.t_lin);
 #endif
 
+    uint16_t settings_sel = 0;
+    the_sensor.settings.temp_en = BMP3_ENABLE;
+    settings_sel |= BMP3_SEL_TEMP_EN;
+    the_sensor.settings.press_en = BMP3_ENABLE;
+    settings_sel |= BMP3_SEL_PRESS_EN;
+    rslt = bmp3_set_sensor_settings(settings_sel, &the_sensor);
+
+    if (rslt != BMP3_OK){
+      Serial.println("FAIL setting sensor");
+      return false;
+    }
+
   setTemperatureOversampling(BMP3_NO_OVERSAMPLING);
   setPressureOversampling(BMP3_NO_OVERSAMPLING);
   setIIRFilterCoeff(BMP3_IIR_FILTER_DISABLE);
   setOutputDataRate(BMP3_ODR_25_HZ);
 
-  // don't do anything till we request a reading
-  the_sensor.settings.op_mode = BMP3_MODE_FORCED;
+/* Used to select the settings user needs to change */
+  settings_sel = 0;
+  /* Variable used to select the sensor component */
+  uint8_t sensor_comp = 0;
+
+  the_sensor.settings.op_mode = BMP3_MODE_NORMAL;
+  rslt = bmp3_set_op_mode(&the_sensor);
+  if (rslt != BMP3_OK){
+    Serial.println("FAIL setting normal mode");
+    return false;
+  }
 
   return true;
 }
@@ -301,79 +324,21 @@ float Adafruit_BMP3XX::readAltitude(float seaLevel) {
 */
 /**************************************************************************/
 bool Adafruit_BMP3XX::performReading(void) {
-  int8_t rslt;
-  /* Used to select the settings user needs to change */
-  uint16_t settings_sel = 0;
-  /* Variable used to select the sensor component */
-  uint8_t sensor_comp = 0;
+    int8_t rslt;
 
-  /* Select the pressure and temperature sensor to be enabled */
-  the_sensor.settings.temp_en = BMP3_ENABLE;
-  settings_sel |= BMP3_SEL_TEMP_EN;
-  sensor_comp |= BMP3_TEMP;
-  if (_tempOSEnabled) {
-    settings_sel |= BMP3_SEL_TEMP_OS;
-  }
+    // Variable used to select the sensor component
+    uint8_t sensor_comp = 0;
 
-  the_sensor.settings.press_en = BMP3_ENABLE;
-  settings_sel |= BMP3_SEL_PRESS_EN;
-  sensor_comp |= BMP3_PRESS;
-  if (_presOSEnabled) {
-    settings_sel |= BMP3_SEL_PRESS_OS;
-  }
+    // Variable used to store the compensated data
+    struct bmp3_data data;
 
-  if (_filterEnabled) {
-    settings_sel |= BMP3_SEL_IIR_FILTER;
-  }
+    // Temperature and Pressure data are read and stored in the bmp3_data instance
+    sensor_comp = BMP3_ALL;
+    rslt = bmp3_get_sensor_data(sensor_comp, &data, &the_sensor);
+    if (rslt != BMP3_OK)
+        return false;
 
-  if (_ODREnabled) {
-    settings_sel |= BMP3_SEL_ODR;
-  }
-
-  // set interrupt to data ready
-  // settings_sel |= BMP3_DRDY_EN_SEL | BMP3_LEVEL_SEL | BMP3_LATCH_SEL;
-
-  /* Set the desired sensor configuration */
-#ifdef BMP3XX_DEBUG
-  Serial.println("Setting sensor settings");
-#endif
-  rslt = bmp3_set_sensor_settings(settings_sel, &the_sensor);
-
-  if (rslt != BMP3_OK)
-    return false;
-
-  /* Set the power mode */
-  the_sensor.settings.op_mode = BMP3_MODE_FORCED;
-#ifdef BMP3XX_DEBUG
-  Serial.println(F("Setting power mode"));
-#endif
-  rslt = bmp3_set_op_mode(&the_sensor);
-  if (rslt != BMP3_OK)
-    return false;
-  
-
-  /* Variable used to store the compensated data */
-  struct bmp3_data data;
-
-  /* Temperature and Pressure data are read and stored in the bmp3_data instance
-   */
-#ifdef BMP3XX_DEBUG
-  Serial.println(F("Getting sensor data"));
-#endif
-  rslt = bmp3_get_sensor_data(sensor_comp, &data, &the_sensor);
-  if (rslt != BMP3_OK)
-    return false;
-
-  /*
-#ifdef BMP3XX_DEBUG
-  Serial.println(F("Analyzing sensor data"));
-#endif
-  rslt = analyze_sensor_data(&data);
-  if (rslt != BMP3_OK)
-    return false;
-    */
-
-  /* Save the temperature and pressure data */
+  // Save the temperature and pressure data
   temperature = data.temperature;
   pressure = data.pressure;
 
@@ -391,15 +356,25 @@ bool Adafruit_BMP3XX::performReading(void) {
 /**************************************************************************/
 
 bool Adafruit_BMP3XX::setTemperatureOversampling(uint8_t oversample) {
+  int8_t rslt = 0;
+  uint16_t settings_sel = 0;
+
   if (oversample > BMP3_OVERSAMPLING_32X)
     return false;
 
-  the_sensor.settings.odr_filter.temp_os = oversample;
+    the_sensor.settings.temp_en = BMP3_ENABLE;
+    the_sensor.settings.odr_filter.temp_os = oversample;
+    settings_sel |= BMP3_SEL_TEMP_EN;
 
-  if (oversample == BMP3_NO_OVERSAMPLING)
-    _tempOSEnabled = false;
-  else
-    _tempOSEnabled = true;
+    if (oversample != BMP3_NO_OVERSAMPLING) {
+        settings_sel |= BMP3_SEL_TEMP_OS;
+    }
+    rslt = bmp3_set_sensor_settings(settings_sel, &the_sensor);
+
+    if (rslt != BMP3_OK){
+      Serial.println("FAIL setTemperatureOversampling");
+      return false;
+    }
 
   return true;
 }
@@ -414,15 +389,26 @@ bool Adafruit_BMP3XX::setTemperatureOversampling(uint8_t oversample) {
 */
 /**************************************************************************/
 bool Adafruit_BMP3XX::setPressureOversampling(uint8_t oversample) {
+  int8_t rslt = 0;
+  uint16_t settings_sel = 0;
+
   if (oversample > BMP3_OVERSAMPLING_32X)
     return false;
 
-  the_sensor.settings.odr_filter.press_os = oversample;
+  if (oversample != BMP3_NO_OVERSAMPLING) {
+    settings_sel |= BMP3_SEL_PRESS_OS;
+  }
 
-  if (oversample == BMP3_NO_OVERSAMPLING)
-    _presOSEnabled = false;
-  else
-    _presOSEnabled = true;
+  the_sensor.settings.odr_filter.press_os = oversample;
+  the_sensor.settings.press_en = BMP3_ENABLE;
+  settings_sel |= BMP3_SEL_PRESS_EN;
+
+    rslt = bmp3_set_sensor_settings(settings_sel, &the_sensor);
+
+    if (rslt != BMP3_OK){
+      Serial.println("FAIL setPressureOversampling");
+      return false;
+    }
 
   return true;
 }
@@ -439,15 +425,24 @@ bool Adafruit_BMP3XX::setPressureOversampling(uint8_t oversample) {
 */
 /**************************************************************************/
 bool Adafruit_BMP3XX::setIIRFilterCoeff(uint8_t filtercoeff) {
+  int8_t rslt = 0;
+  uint16_t settings_sel = 0;
+
   if (filtercoeff > BMP3_IIR_FILTER_COEFF_127)
     return false;
 
   the_sensor.settings.odr_filter.iir_filter = filtercoeff;
 
-  if (filtercoeff == BMP3_IIR_FILTER_DISABLE)
-    _filterEnabled = false;
-  else
-    _filterEnabled = true;
+  if (filtercoeff != BMP3_IIR_FILTER_DISABLE) {
+    settings_sel |= BMP3_SEL_IIR_FILTER;
+  }
+
+    rslt = bmp3_set_sensor_settings(settings_sel, &the_sensor);
+
+    if (rslt != BMP3_OK){
+      Serial.println("FAIL setIIRFilterCoeff");
+      return false;
+    }
 
   return true;
 }
@@ -465,12 +460,22 @@ bool Adafruit_BMP3XX::setIIRFilterCoeff(uint8_t filtercoeff) {
 */
 /**************************************************************************/
 bool Adafruit_BMP3XX::setOutputDataRate(uint8_t odr) {
+  int8_t rslt = 0;
+  uint16_t settings_sel = 0;
+
   if (odr > BMP3_ODR_0_001_HZ)
     return false;
 
-  the_sensor.settings.odr_filter.odr = odr;
+    the_sensor.settings.odr_filter.odr = odr;
 
-  _ODREnabled = true;
+    settings_sel |= BMP3_SEL_ODR;
+
+    rslt = bmp3_set_sensor_settings(settings_sel, &the_sensor);
+
+    if (rslt != BMP3_OK){
+      Serial.println("FAIL setOutputDataRate");
+      return false;
+    }
 
   return true;
 }
