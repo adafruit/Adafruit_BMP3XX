@@ -30,8 +30,8 @@
 
 //#define BMP3XX_DEBUG
 
-Adafruit_I2CDevice *i2c_dev = NULL; ///< Global I2C interface pointer
-Adafruit_SPIDevice *spi_dev = NULL; ///< Global SPI interface pointer
+Adafruit_I2CDevice *g_i2c_dev = NULL; ///< Global I2C interface pointer
+Adafruit_SPIDevice *g_spi_dev = NULL; ///< Global SPI interface pointer
 
 // Our hardware interface functions
 static int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len,
@@ -80,7 +80,7 @@ bool Adafruit_BMP3XX::begin_I2C(uint8_t addr, TwoWire *theWire) {
     delete spi_dev;
   spi_dev = NULL;
 
-  i2c_dev = new Adafruit_I2CDevice(addr, theWire);
+  g_i2c_dev = i2c_dev = new Adafruit_I2CDevice(addr, theWire);
 
   // verify i2c address was found
   if (!i2c_dev->begin()) {
@@ -91,7 +91,7 @@ bool Adafruit_BMP3XX::begin_I2C(uint8_t addr, TwoWire *theWire) {
   the_sensor.intf = BMP3_I2C_INTF;
   the_sensor.read = &i2c_read;
   the_sensor.write = &i2c_write;
-  the_sensor.intf_ptr = i2c_dev;
+  the_sensor.intf_ptr = g_i2c_dev;
   the_sensor.dummy_byte = 0;
 
   return _init();
@@ -110,11 +110,12 @@ bool Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI) {
     delete spi_dev;
   i2c_dev = NULL;
 
-  spi_dev = new Adafruit_SPIDevice(cs_pin,
-                                   BMP3XX_DEFAULT_SPIFREQ, // frequency
-                                   SPI_BITORDER_MSBFIRST,  // bit order
-                                   SPI_MODE0,              // data mode
-                                   theSPI);
+  g_spi_dev = spi_dev =
+      new Adafruit_SPIDevice(cs_pin,
+                             BMP3XX_DEFAULT_SPIFREQ, // frequency
+                             SPI_BITORDER_MSBFIRST,  // bit order
+                             SPI_MODE0,              // data mode
+                             theSPI);
 
   if (!spi_dev->begin()) {
     return false;
@@ -124,7 +125,7 @@ bool Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI) {
   the_sensor.intf = BMP3_SPI_INTF;
   the_sensor.read = &spi_read;
   the_sensor.write = &spi_write;
-  the_sensor.intf_ptr = spi_dev;
+  the_sensor.intf_ptr = g_spi_dev;
   the_sensor.dummy_byte = 1;
 
   return _init();
@@ -146,10 +147,11 @@ bool Adafruit_BMP3XX::begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
     delete spi_dev;
   i2c_dev = NULL;
 
-  spi_dev = new Adafruit_SPIDevice(cs_pin, sck_pin, miso_pin, mosi_pin,
-                                   BMP3XX_DEFAULT_SPIFREQ, // frequency
-                                   SPI_BITORDER_MSBFIRST,  // bit order
-                                   SPI_MODE0);             // data mode
+  g_spi_dev = spi_dev =
+      new Adafruit_SPIDevice(cs_pin, sck_pin, miso_pin, mosi_pin,
+                             BMP3XX_DEFAULT_SPIFREQ, // frequency
+                             SPI_BITORDER_MSBFIRST,  // bit order
+                             SPI_MODE0);             // data mode
 
   if (!spi_dev->begin()) {
     return false;
@@ -159,13 +161,15 @@ bool Adafruit_BMP3XX::begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
   the_sensor.intf = BMP3_SPI_INTF;
   the_sensor.read = &spi_read;
   the_sensor.write = &spi_write;
-  the_sensor.intf_ptr = spi_dev;
+  the_sensor.intf_ptr = g_spi_dev;
   the_sensor.dummy_byte = 1;
 
   return _init();
 }
 
 bool Adafruit_BMP3XX::_init(void) {
+  g_i2c_dev = i2c_dev;
+  g_spi_dev = spi_dev;
   the_sensor.delay_us = delay_usec;
   int8_t rslt = BMP3_OK;
 
@@ -301,6 +305,8 @@ float Adafruit_BMP3XX::readAltitude(float seaLevel) {
 */
 /**************************************************************************/
 bool Adafruit_BMP3XX::performReading(void) {
+  g_i2c_dev = i2c_dev;
+  g_spi_dev = spi_dev;
   int8_t rslt;
   /* Used to select the settings user needs to change */
   uint16_t settings_sel = 0;
@@ -350,7 +356,6 @@ bool Adafruit_BMP3XX::performReading(void) {
   rslt = bmp3_set_op_mode(&the_sensor);
   if (rslt != BMP3_OK)
     return false;
-  
 
   /* Variable used to store the compensated data */
   struct bmp3_data data;
@@ -464,7 +469,7 @@ bool Adafruit_BMP3XX::setIIRFilterCoeff(uint8_t filtercoeff) {
 
 */
 /**************************************************************************/
-bool Adafruit_BMP3XX::setOutputDataRate(uint8_t odr) {
+bool Adafruit_BMP3XX::Adafruit_BMP3XX::setOutputDataRate(uint8_t odr) {
   if (odr > BMP3_ODR_0_001_HZ)
     return false;
 
@@ -485,7 +490,7 @@ int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len,
   // Serial.print("I2C read address 0x"); Serial.print(reg_addr, HEX);
   // Serial.print(" len "); Serial.println(len, HEX);
 
-  if (!i2c_dev->write_then_read(&reg_addr, 1, reg_data, len))
+  if (!g_i2c_dev->write_then_read(&reg_addr, 1, reg_data, len))
     return 1;
 
   return 0;
@@ -501,7 +506,7 @@ int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len,
   // Serial.print("I2C write address 0x"); Serial.print(reg_addr, HEX);
   // Serial.print(" len "); Serial.println(len, HEX);
 
-  if (!i2c_dev->write((uint8_t *)reg_data, len, false, &reg_addr, 1))
+  if (!g_i2c_dev->write((uint8_t *)reg_data, len, false, &reg_addr, 1))
     return 1;
 
   return 0;
@@ -514,7 +519,7 @@ int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len,
 /**************************************************************************/
 static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len,
                        void *intf_ptr) {
-  spi_dev->write_then_read(&reg_addr, 1, reg_data, len, 0xFF);
+  g_spi_dev->write_then_read(&reg_addr, 1, reg_data, len, 0xFF);
   return 0;
 }
 
@@ -525,7 +530,7 @@ static int8_t spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len,
 /**************************************************************************/
 static int8_t spi_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len,
                         void *intf_ptr) {
-  spi_dev->write((uint8_t *)reg_data, len, &reg_addr, 1);
+  g_spi_dev->write((uint8_t *)reg_data, len, &reg_addr, 1);
 
   return 0;
 }
