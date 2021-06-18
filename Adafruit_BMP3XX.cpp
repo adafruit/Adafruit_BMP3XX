@@ -469,7 +469,7 @@ bool Adafruit_BMP3XX::setIIRFilterCoeff(uint8_t filtercoeff) {
 
 */
 /**************************************************************************/
-bool Adafruit_BMP3XX::Adafruit_BMP3XX::setOutputDataRate(uint8_t odr) {
+bool Adafruit_BMP3XX::setOutputDataRate(uint8_t odr) {
   if (odr > BMP3_ODR_0_001_HZ)
     return false;
 
