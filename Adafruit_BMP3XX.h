@@ -66,6 +66,9 @@ public:
   double pressure;
 
 private:
+  Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
+  Adafruit_SPIDevice *spi_dev = NULL; ///< Pointer to SPI bus interface
+
   bool _init(void);
 
   bool _filterEnabled, _tempOSEnabled, _presOSEnabled, _ODREnabled;
