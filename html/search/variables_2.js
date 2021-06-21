@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['spi_5fdev',['spi_dev',['../_adafruit___b_m_p3_x_x_8cpp.html#a27c0d8ef0f97fe3dc0725a4315412a83',1,'Adafruit_BMP3XX.cpp']]]
+  ['temperature',['temperature',['../class_adafruit___b_m_p3_x_x.html#abaacf524647f5aafbd6cd663806dddc0',1,'Adafruit_BMP3XX']]]
 ];
