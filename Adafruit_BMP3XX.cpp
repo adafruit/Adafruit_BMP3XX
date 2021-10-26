@@ -506,7 +506,7 @@ int8_t i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len,
   // Serial.print("I2C write address 0x"); Serial.print(reg_addr, HEX);
   // Serial.print(" len "); Serial.println(len, HEX);
 
-  if (!g_i2c_dev->write((uint8_t *)reg_data, len, false, &reg_addr, 1))
+  if (!g_i2c_dev->write((uint8_t *)reg_data, len, true, &reg_addr, 1))
     return 1;
 
   return 0;
