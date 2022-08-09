@@ -50,12 +50,14 @@ void setup() {
   bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
   bmp.setOutputDataRate(BMP3_ODR_50_HZ);
 
-  for (uint32_t speed = 50000; speed < 650000; speed += 50000)
+  Serial.println();
+  for (uint32_t speed = 50000; speed < 850000; speed += 50000)
   {
     Serial.print("I2C: \t");
     Serial.println(speed);
     Wire.setClock(speed);
     measure();
+    delay(2000);
   }
 
   Serial.println("\ndone...");
@@ -76,24 +78,30 @@ void measure() {
   delay(100);
 
   start = micros();
-  bmp.readTemperature();
+  float temperature = bmp.readTemperature();
   stop = micros();
   Serial.print("readTemperature:");
-  Serial.println(stop - start);
+  Serial.print(stop - start);
+  Serial.print("\t");
+  Serial.println(temperature);
   delay(100);
 
   start = micros();
-  bmp.readPressure();
+  float pressure = bmp.readPressure();
   stop = micros();
   Serial.print("readPressure:\t");
-  Serial.println(stop - start);
+  Serial.print(stop - start);
+  Serial.print("\t");
+  Serial.println(pressure * 0.01  );
   delay(100);
 
   start = micros();
-  bmp.readAltitude(SEALEVELPRESSURE_HPA);
+  float altitude = bmp.readAltitude(SEALEVELPRESSURE_HPA);
   stop = micros();
   Serial.print("readAltitude:\t");
-  Serial.println(stop - start);
+  Serial.print(stop - start);
+  Serial.print("\t");
+  Serial.println(altitude);
   delay(100);
   Serial.println();
 }
