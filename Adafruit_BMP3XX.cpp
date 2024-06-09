@@ -103,7 +103,8 @@ bool Adafruit_BMP3XX::begin_I2C(uint8_t addr, TwoWire *theWire) {
  *    @param  theSPI The SPI object to be used for SPI connections.
  *    @return True if initialization was successful, otherwise false.
  */
-bool Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI) {
+bool Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI,
+                                uint32_t frequency) {
   if (i2c_dev)
     delete i2c_dev;
   if (spi_dev)
@@ -112,7 +113,7 @@ bool Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI) {
 
   g_spi_dev = spi_dev =
       new Adafruit_SPIDevice(cs_pin,
-                             BMP3XX_DEFAULT_SPIFREQ, // frequency
+                             frequency,              // frequency
                              SPI_BITORDER_MSBFIRST,  // bit order
                              SPI_MODE0,              // data mode
                              theSPI);
@@ -140,7 +141,7 @@ bool Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI) {
  *    @return True if initialization was successful, otherwise false.
  */
 bool Adafruit_BMP3XX::begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
-                                int8_t mosi_pin) {
+                                int8_t mosi_pin, uint32_t frequency) {
   if (i2c_dev)
     delete i2c_dev;
   if (spi_dev)
@@ -149,7 +150,7 @@ bool Adafruit_BMP3XX::begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
 
   g_spi_dev = spi_dev =
       new Adafruit_SPIDevice(cs_pin, sck_pin, miso_pin, mosi_pin,
-                             BMP3XX_DEFAULT_SPIFREQ, // frequency
+                             frequency,              // frequency
                              SPI_BITORDER_MSBFIRST,  // bit order
                              SPI_MODE0);             // data mode
 
