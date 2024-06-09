@@ -101,6 +101,7 @@ bool Adafruit_BMP3XX::begin_I2C(uint8_t addr, TwoWire *theWire) {
  *    @brief  Sets up the hardware and initializes hardware SPI
  *    @param  cs_pin The arduino pin # connected to chip select
  *    @param  theSPI The SPI object to be used for SPI connections.
+ *    @param  frequency The SPI bus frequency
  *    @return True if initialization was successful, otherwise false.
  */
 bool Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI,
@@ -138,6 +139,7 @@ bool Adafruit_BMP3XX::begin_SPI(uint8_t cs_pin, SPIClass *theSPI,
  *    @param  sck_pin The arduino pin # connected to SPI clock
  *    @param  miso_pin The arduino pin # connected to SPI MISO
  *    @param  mosi_pin The arduino pin # connected to SPI MOSI
+ *    @param  frequency The SPI bus frequency
  *    @return True if initialization was successful, otherwise false.
  */
 bool Adafruit_BMP3XX::begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
