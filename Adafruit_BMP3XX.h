@@ -44,9 +44,10 @@ public:
 
   bool begin_I2C(uint8_t addr = BMP3XX_DEFAULT_ADDRESS,
                  TwoWire *theWire = &Wire);
-  bool begin_SPI(uint8_t cs_pin, SPIClass *theSPI = &SPI);
+  bool begin_SPI(uint8_t cs_pin, SPIClass *theSPI = &SPI,
+                 uint32_t frequency = BMP3XX_DEFAULT_SPIFREQ);
   bool begin_SPI(int8_t cs_pin, int8_t sck_pin, int8_t miso_pin,
-                 int8_t mosi_pin);
+                 int8_t mosi_pin, uint32_t frequency = BMP3XX_DEFAULT_SPIFREQ);
   uint8_t chipID(void);
   float readTemperature(void);
   float readPressure(void);
